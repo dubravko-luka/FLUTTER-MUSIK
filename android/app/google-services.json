@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "597182726586",
+    "project_id": "musik-3ba96",
+    "storage_bucket": "musik-3ba96.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597182726586:android:ba5b11a37334d959319d83",
+        "android_client_info": {
+          "package_name": "com.example.musik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIyvBKHPyU-IkDj5HVors3N3gEJh1YtZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
