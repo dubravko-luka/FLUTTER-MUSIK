@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musik/screens/main_screen.dart';
-import 'screens/login_screen.dart';
+import 'screens/auth/login_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() async {

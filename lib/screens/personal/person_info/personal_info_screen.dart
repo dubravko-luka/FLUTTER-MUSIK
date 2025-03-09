@@ -27,7 +27,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://127.0.0.1:5000/user_info'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('http://127.0.0.1:5000/user_info'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -46,7 +49,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('Thông tin cá nhân'),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
@@ -85,7 +88,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     child: CircleAvatar(
                                       radius: 56,
                                       backgroundColor: Colors.white,
-                                      child: Icon(Icons.person, size: 60, color: Colors.teal.shade600),
+                                      child: Icon(
+                                        Icons.person,
+                                        size: 60,
+                                        color: Colors.teal.shade600,
+                                      ),
                                     ),
                                   ),
                                   Positioned(
@@ -95,7 +102,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                       onPressed: () {},
                                       mini: true,
                                       backgroundColor: Colors.teal,
-                                      child: Icon(Icons.edit, color: Colors.white),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -103,15 +113,23 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             SizedBox(height: 30),
                             Card(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
                               elevation: 5,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   children: [
-                                    _buildInfoRow('Name:', _name ?? 'Loading...'),
+                                    _buildInfoRow(
+                                      'Name:',
+                                      _name ?? 'Loading...',
+                                    ),
                                     Divider(),
-                                    _buildInfoRow('Email:', _email ?? 'Loading...'),
+                                    _buildInfoRow(
+                                      'Email:',
+                                      _email ?? 'Loading...',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -130,8 +148,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.teal)),
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.teal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
       ],
     );
   }

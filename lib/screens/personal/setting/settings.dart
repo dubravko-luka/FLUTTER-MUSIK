@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:musik/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'my_language_dialog.dart';
+import 'privacy_policy_screen.dart';
+import 'about_app_screen.dart';
+import '../../auth/login_screen.dart'; // Ensure you have a login screen
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _notificationsEnabled = true; // Initial state for notifications
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('Cài đặt'),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
@@ -34,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
               title: 'Ngôn ngữ',
               subtitle: 'Tiếng Việt',
               onTap: () {
-                // Add language selection logic here
+                _selectLanguage(context);
               },
             ),
             _buildSettingTile(
@@ -42,9 +52,13 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.notifications,
               title: 'Thông báo',
               trailing: Switch(
-                value: true,
+                value: _notificationsEnabled,
                 onChanged: (bool value) {
-                  // Add notification toggle logic here
+                  setState(() {
+                    _notificationsEnabled = value;
+                  });
+                  // Save to SharedPreferences
+                  _saveNotificationPreference(value);
                 },
               ),
             ),
@@ -53,7 +67,7 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.lock,
               title: 'Quyền riêng tư',
               onTap: () {
-                // Add privacy settings logic here
+                _showPrivacySettings(context);
               },
             ),
             _buildSettingTile(
@@ -61,7 +75,7 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.info,
               title: 'Giới thiệu về ứng dụng',
               onTap: () {
-                // Add about app logic here
+                _showAboutApp(context);
               },
             ),
             Divider(color: Colors.grey.shade800),
@@ -78,12 +92,39 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _selectLanguage(BuildContext context) async {
+    // Show a dialog for language selection
+    showLanguageDialog(context);
+  }
+
+  void _saveNotificationPreference(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_enabled', value);
+  }
+
+  void _showPrivacySettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+    );
+  }
+
+  void _showAboutApp(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AboutAppScreen()),
+    );
+  }
+
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Clear all saved data
 
-    // Navigate back to login screen and clear the navigation stack
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen()), (Route<dynamic> route) => false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   Widget _buildSettingTile(
@@ -100,7 +141,10 @@ class SettingsScreen extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: Icon(icon, color: Colors.teal),
-        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
         subtitle: subtitle != null ? Text(subtitle) : null,
         trailing: trailing,
         onTap: onTap,

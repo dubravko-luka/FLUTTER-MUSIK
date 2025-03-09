@@ -5,7 +5,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('Trợ giúp và hỗ trợ'),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
@@ -28,16 +28,34 @@ class HelpSupportScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Câu hỏi thường gặp', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+              Text(
+                'Câu hỏi thường gặp',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
               SizedBox(height: 10),
-              _buildFAQTile('Làm thế nào để tạo tài khoản?', Icons.person_add, () {
-                // Navigate to answer or show dialog
-              }),
+              _buildFAQTile(
+                'Làm thế nào để tạo tài khoản?',
+                Icons.person_add,
+                () {
+                  // Navigate to answer or show dialog
+                },
+              ),
               _buildFAQTile('Cách thức tải nhạc lên?', Icons.cloud_upload, () {
                 // Navigate to answer or show dialog
               }),
               SizedBox(height: 30),
-              Text('Liên hệ chúng tôi', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+              Text(
+                'Liên hệ chúng tôi',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
               SizedBox(height: 10),
               _buildContactTile(Icons.email, 'support@example.com', () {
                 // Open email client
@@ -73,7 +91,10 @@ class HelpSupportScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         leading: Icon(icon, color: Colors.teal),
-        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
         trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: onTap,
       ),
@@ -84,7 +105,11 @@ class HelpSupportScreen extends StatelessWidget {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(leading: Icon(icon, color: Colors.teal), title: Text(info, style: TextStyle(fontSize: 18)), onTap: onTap),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.teal),
+        title: Text(info, style: TextStyle(fontSize: 18)),
+        onTap: onTap,
+      ),
     );
   }
 }
