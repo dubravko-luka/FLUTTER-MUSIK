@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import '../library/album_saved/album_selection_dialog.dart';
-import 'friend_options_sheet.dart'; // Ensure you have this component
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:musik/services/music_service.dart';
+import 'package:musik/controllers/audio_controller.dart';
+import 'package:musik/screens/library/album_saved/album_selection_dialog.dart';
+import 'package:musik/screens/home/friend_options_sheet.dart';
 
 class MusicPlayer extends StatefulWidget {
   final int id;
@@ -38,8 +37,8 @@ class MusicPlayer extends StatefulWidget {
 }
 
 class _MusicPlayerState extends State<MusicPlayer> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  final storage = FlutterSecureStorage();
+  final AudioController _audioController = AudioController();
+  final MusicService _musicService = MusicService();
   bool isPlaying = false;
   late bool _inAlbum;
 
@@ -48,31 +47,14 @@ class _MusicPlayerState extends State<MusicPlayer> {
     super.initState();
     _inAlbum = widget.inAlbum;
     _setupAudio();
-    _audioPlayer.playbackEventStream.listen((event) {
-      if (event.processingState == ProcessingState.completed) {
-        _handlePlaybackComplete();
-      }
-    });
   }
 
   void _setupAudio() async {
-    if (widget.url.isNotEmpty) {
-      try {
-        await _audioPlayer.setUrl(widget.url);
-      } catch (e) {
-        if (mounted) {
-          print("Error setting URL music player: $e");
-        }
-      }
+    try {
+      await _audioController.setUrl(widget.url);
+    } catch (e) {
+      print("Error setting URL: $e");
     }
-  }
-
-  void _handlePlaybackComplete() {
-    setState(() {
-      isPlaying = false;
-    });
-    widget.setPlayingId(-1);
-    _audioPlayer.setUrl('');
   }
 
   @override
@@ -82,7 +64,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
       setState(() {
         isPlaying = false;
       });
-      _audioPlayer.pause();
+      _audioController.pause();
     }
   }
 
@@ -92,10 +74,11 @@ class _MusicPlayerState extends State<MusicPlayer> {
       setState(() {
         isPlaying = false;
       });
-      _audioPlayer.pause();
+      _audioController.pause();
     } else {
-      if (_audioPlayer.processingState == ProcessingState.completed) {
-        await _audioPlayer.seek(Duration.zero);
+      if (_audioController.audioPlayer.processingState ==
+          ProcessingState.completed) {
+        await _audioController.seek(Duration.zero);
       }
       setState(() {
         isPlaying = true;
@@ -104,28 +87,17 @@ class _MusicPlayerState extends State<MusicPlayer> {
         _setupAudio();
       }
       widget.setPlayingId(widget.id);
-      _audioPlayer.play();
+      _audioController.play();
     }
   }
 
   Future<void> _removeFromAlbum() async {
-    final token = await storage.read(key: 'authToken');
-    if (token == null) {
-      return;
-    }
-
-    final url = Uri.parse('http://10.50.80.162:5000/remove_music_from_album');
-    final response = await http.delete(
-      url,
-      headers: {'Content-Type': 'application/json', 'Authorization': token},
-      body: jsonEncode({'album_id': widget.albumId, 'music_id': widget.id}),
-    );
-
-    if (response.statusCode == 200) {
+    try {
+      await _musicService.removeFromAlbum(widget.albumId ?? -1, widget.id);
       setState(() {
         _inAlbum = false;
       });
-    } else {
+    } catch (e) {
       // Handle error
     }
   }
@@ -133,11 +105,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder:
           (context) => FriendOptionsSheet(
             name: widget.name,
-            avatarUrl: "https://via.placeholder.com/150", // Replace with actual URL
+            avatarUrl: "https://via.placeholder.com/150",
             profileUserId: widget.user_id,
           ),
     );
@@ -145,7 +119,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _audioController.dispose();
     super.dispose();
   }
 
@@ -161,7 +135,11 @@ class _MusicPlayerState extends State<MusicPlayer> {
           children: [
             GestureDetector(
               onTap: () => _showBottomSheet(context),
-              child: CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.teal.shade100,
+                child: Icon(Icons.person, color: Colors.teal, size: 30),
+              ),
             ),
             SizedBox(width: 16),
             Expanded(
@@ -170,37 +148,59 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 children: [
                   GestureDetector(
                     onTap: () => _showBottomSheet(context),
-                    child: Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: Text(
+                      widget.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
-                  Text(widget.description, style: TextStyle(color: Colors.black54)),
+                  Text(
+                    widget.description,
+                    style: TextStyle(color: Colors.black54),
+                  ),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
+                        icon: Icon(
+                          isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          color: Colors.teal,
+                        ),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
-                        stream: _audioPlayer.positionStream,
+                        stream: _audioController.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
+                          return Text(
+                            position.toString().split('.').first,
+                            style: TextStyle(color: Colors.black54),
+                          );
                         },
                       ),
                       Expanded(
                         child: StreamBuilder<Duration?>(
-                          stream: _audioPlayer.durationStream,
+                          stream: _audioController.durationStream,
                           builder: (context, snapshot) {
                             final duration = snapshot.data ?? Duration.zero;
                             return StreamBuilder<Duration>(
-                              stream: _audioPlayer.positionStream,
+                              stream: _audioController.positionStream,
                               builder: (context, snapshot) {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
+                                  max:
+                                      duration.inMilliseconds.toDouble() > 0
+                                          ? duration.inMilliseconds.toDouble()
+                                          : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
+                                    await _audioController.seek(
+                                      Duration(milliseconds: value.toInt()),
+                                    );
                                   },
                                   activeColor: Colors.teal,
                                   inactiveColor: Colors.teal.shade100,
@@ -220,17 +220,26 @@ class _MusicPlayerState extends State<MusicPlayer> {
               children: [
                 Icon(Icons.share, color: Colors.teal),
                 SizedBox(height: 8),
-                IconButton(icon: Icon(widget.isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.teal), onPressed: widget.onToggleLike),
+                IconButton(
+                  icon: Icon(
+                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.teal,
+                  ),
+                  onPressed: widget.onToggleLike,
+                ),
                 SizedBox(height: 8),
                 IconButton(
-                  icon: Icon(_inAlbum ? Icons.bookmark : Icons.bookmark_border, color: Colors.teal),
+                  icon: Icon(
+                    _inAlbum ? Icons.bookmark : Icons.bookmark_border,
+                    color: Colors.teal,
+                  ),
                   onPressed: () {
                     if (_inAlbum) {
                       _removeFromAlbum();
                     } else {
                       showAlbumSelectionDialog(context, widget.id, () {
                         setState(() {
-                          _inAlbum = true; // Update the bookmark state
+                          _inAlbum = true;
                         });
                       });
                     }

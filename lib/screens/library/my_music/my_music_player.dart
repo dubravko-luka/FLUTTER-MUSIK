@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'dart:convert';
 import 'package:just_audio/just_audio.dart';
 
 class MyMusicPlayer extends StatefulWidget {
@@ -8,6 +12,7 @@ class MyMusicPlayer extends StatefulWidget {
   final String description;
   final int currentPlayingId;
   final Function(int id) setPlayingId;
+  final VoidCallback onDelete; // Callback for deletion
 
   MyMusicPlayer({
     required this.id,
@@ -16,6 +21,7 @@ class MyMusicPlayer extends StatefulWidget {
     required this.description,
     required this.currentPlayingId,
     required this.setPlayingId,
+    required this.onDelete, // Pass the callback
   });
 
   @override
@@ -24,6 +30,7 @@ class MyMusicPlayer extends StatefulWidget {
 
 class _MyMusicPlayerState extends State<MyMusicPlayer> {
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final storage = FlutterSecureStorage();
   bool isPlaying = false;
 
   @override
@@ -51,6 +58,38 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
     });
     widget.setPlayingId(-1);
     _audioPlayer.setUrl('');
+  }
+
+  Future<void> _deleteMusic() async {
+    final token = await storage.read(key: 'authToken');
+    if (token == null) {
+      _showMessage('Authentication token not found');
+      return;
+    }
+
+    final response = await http.delete(
+      Uri.parse('http://127.0.0.1:5000/delete_music/${widget.id}'),
+      headers: {'Authorization': token},
+    );
+
+    if (response.statusCode == 200) {
+      widget.onDelete(); // Invoke callback on successful deletion
+      _showMessage('Music deleted successfully');
+    } else {
+      _showMessage('Failed to delete music');
+    }
+  }
+
+  void _showMessage(String message) {
+    showToast(
+      message,
+      context: context,
+      position: StyledToastPosition.top,
+      backgroundColor: Colors.black54,
+      animation: StyledToastAnimation.slideFromTop,
+      reverseAnimation: StyledToastAnimation.slideToTop,
+      duration: Duration(seconds: 3),
+    );
   }
 
   @override
@@ -157,9 +196,7 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
               children: [
                 IconButton(
                   icon: Icon(Icons.delete, color: Colors.teal),
-                  onPressed: () {
-                    // Handle delete action
-                  },
+                  onPressed: _deleteMusic, // Call delete function
                 ),
               ],
             ),

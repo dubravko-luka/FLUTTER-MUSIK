@@ -69,6 +69,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       });
       _showMessage('Friend request accepted');
     } else {
+      _fetchFriendRequests();
       _showMessage('Failed to accept friend request');
     }
   }
@@ -92,6 +93,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       });
       _showMessage('Friend request declined');
     } else {
+      _fetchFriendRequests();
       _showMessage('Failed to decline friend request');
     }
   }

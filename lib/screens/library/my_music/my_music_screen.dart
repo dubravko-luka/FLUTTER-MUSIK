@@ -78,6 +78,9 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
                           _currentPlayingId = songId;
                         });
                       },
+                      onDelete: () {
+                        _fetchSongs();
+                      },
                     );
                   },
                 ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'music_player.dart';
+import 'package:musik/common/config.dart';
+import 'package:musik/screens/music_player/music_player.dart';
+import 'package:musik/services/music_service.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,7 +9,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final storage = FlutterSecureStorage();
+  final MusicService _musicService = MusicService();
   List<dynamic> _songs = [];
   bool _isLoading = true;
   int _currentPlayingId = -1;
@@ -18,48 +17,27 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchSongs();
+    _loadSongs();
   }
 
-  Future<void> _fetchSongs() async {
-    final token = await storage.read(key: 'authToken');
-    if (token == null) {
-      // Handle missing token
-      return;
-    }
-
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_music'), headers: {'Authorization': token});
-
-    if (response.statusCode == 200) {
+  Future<void> _loadSongs() async {
+    try {
+      final songs = await _musicService.fetchSongs();
       setState(() {
-        final List<dynamic> songs = jsonDecode(response.body);
-        _songs =
-            songs.map((song) {
-              song['liked'] = song['liked'] == 1;
-              song['in_album'] = song['in_album'] == 1;
-              return song;
-            }).toList();
+        _songs = songs;
         _isLoading = false;
       });
-    } else {
+    } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      // Handle error
+      // Handle error, for example by showing a dialog
     }
   }
 
-  Future<void> _toggleLike(int songId, bool isLiked) async {
-    final token = await storage.read(key: 'authToken');
-    if (token == null) {
-      // Handle missing token
-      return;
-    }
-
-    final endpoint = isLiked ? '/unlike_music/$songId' : '/like_music/$songId';
-    final response = await http.post(Uri.parse('http://10.50.80.162:5000$endpoint'), headers: {'Authorization': token});
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
+  Future<void> _handleToggleLike(int songId, bool isLiked) async {
+    try {
+      await _musicService.toggleLike(songId, isLiked);
       setState(() {
         _songs =
             _songs.map((song) {
@@ -69,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
               return song;
             }).toList();
       });
-    } else {
-      // Handle error
+    } catch (e) {
+      // Handle error, for example by showing a dialog
     }
   }
 
@@ -83,7 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(
+          'Musik',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
         elevation: 0,
       ),
@@ -96,18 +77,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: _songs.length,
                   itemBuilder: (context, index) {
                     final song = _songs[index];
-                    final name = song['user_name'] ?? 'Unknown Name';
-                    final description = song['description'] ?? 'No Description';
-                    final isLiked = song['liked'] ?? false;
-                    final inAlbum = song['in_album'] ?? false;
-                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
-
                     return MusicPlayer(
                       id: song['id'],
-                      url: url,
-                      name: name,
+                      url: '$baseUrl/get_music_file/${song['id']}',
+                      name: song['user_name'] ?? 'Unknown Name',
                       user_id: song['user_id'],
-                      description: description,
+                      description: song['description'] ?? 'No Description',
                       currentPlayingId: _currentPlayingId,
                       setPlayingId: (int songId) {
                         setState(() {
@@ -115,10 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       },
                       albumId: song['album_id'],
-                      isLiked: isLiked,
-                      inAlbum: inAlbum,
+                      isLiked: song['liked'] ?? false,
+                      inAlbum: song['in_album'] ?? false,
                       onToggleLike: () {
-                        _toggleLike(song['id'], isLiked);
+                        _handleToggleLike(song['id'], song['liked']);
                       },
                     );
                   },

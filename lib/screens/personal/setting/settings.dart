@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'my_language_dialog.dart';
 import 'privacy_policy_screen.dart';
 import 'about_app_screen.dart';
-import '../../auth/login_screen.dart'; // Ensure you have a login screen
+import '../../auth/login/login_screen.dart'; // Ensure you have a login screen
 
 class SettingsScreen extends StatefulWidget {
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:musik/screens/personal/friend_request/firend_request_screen.dart';
 import 'package:musik/screens/personal/help_support/help_support_screen.dart';
+import 'package:musik/screens/personal/sent_friend_request/sent_firend_request_screen.dart';
 import 'package:musik/screens/personal/setting/settings.dart';
 import 'friend/friends_screen.dart';
 import 'person_info/personal_info_screen.dart';
@@ -58,6 +59,7 @@ class ProfileScreen extends StatelessWidget {
       {'title': 'Tải nhạc lên', 'screen': UploadMusicScreen()},
       {'title': 'Bạn bè', 'screen': FriendsScreen()},
       {'title': 'Lời mời kết bạn', 'screen': FriendRequestsScreen()},
+      {'title': 'Lời mời đã gửi', 'screen': SentFriendRequestsScreen()},
       {'title': 'Trợ giúp & hỗ trợ', 'screen': HelpSupportScreen()},
       {'title': 'Cài đặt', 'screen': SettingsScreen()},
     ];
