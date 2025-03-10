@@ -27,10 +27,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_friend_requests'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_friend_requests'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -61,16 +58,14 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/accept_friend_request'),
+      Uri.parse('http://10.50.80.162:5000/accept_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': requestId}),
     );
 
     if (response.statusCode == 201) {
       setState(() {
-        friendRequests.removeWhere(
-          (request) => request['request_id'] == requestId,
-        );
+        friendRequests.removeWhere((request) => request['request_id'] == requestId);
       });
       _showMessage('Friend request accepted');
     } else {
@@ -86,16 +81,14 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/decline_friend_request'),
+      Uri.parse('http://10.50.80.162:5000/decline_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': requestId}),
     );
 
     if (response.statusCode == 200) {
       setState(() {
-        friendRequests.removeWhere(
-          (request) => request['request_id'] == requestId,
-        );
+        friendRequests.removeWhere((request) => request['request_id'] == requestId);
       });
       _showMessage('Friend request declined');
     } else {
@@ -147,26 +140,15 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
                     final request = friendRequests[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
                         leading: CircleAvatar(
                           radius: 25,
                           backgroundColor: Colors.teal,
-                          child: Text(
-                            request['requester_name'][0],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: Text(request['requester_name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
-                        title: Text(
-                          request['requester_name'],
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        title: Text(request['requester_name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(request['requester_email']),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,

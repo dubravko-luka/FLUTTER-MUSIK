@@ -56,10 +56,14 @@ class _MusicPlayerState extends State<MusicPlayer> {
   }
 
   void _setupAudio() async {
-    try {
-      await _audioPlayer.setUrl(widget.url);
-    } catch (e) {
-      print("Error setting URL: $e");
+    if (widget.url.isNotEmpty) {
+      try {
+        await _audioPlayer.setUrl(widget.url);
+      } catch (e) {
+        if (mounted) {
+          print("Error setting URL music player: $e");
+        }
+      }
     }
   }
 
@@ -110,7 +114,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
       return;
     }
 
-    final url = Uri.parse('http://127.0.0.1:5000/remove_music_from_album');
+    final url = Uri.parse('http://10.50.80.162:5000/remove_music_from_album');
     final response = await http.delete(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
@@ -129,14 +133,11 @@ class _MusicPlayerState extends State<MusicPlayer> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder:
           (context) => FriendOptionsSheet(
             name: widget.name,
-            avatarUrl:
-                "https://via.placeholder.com/150", // Replace with actual URL
+            avatarUrl: "https://via.placeholder.com/150", // Replace with actual URL
             profileUserId: widget.user_id,
           ),
     );
@@ -160,11 +161,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
           children: [
             GestureDetector(
               onTap: () => _showBottomSheet(context),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.teal.shade100,
-                child: Icon(Icons.person, color: Colors.teal, size: 30),
-              ),
+              child: CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
             ),
             SizedBox(width: 16),
             Expanded(
@@ -173,38 +170,21 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 children: [
                   GestureDetector(
                     onTap: () => _showBottomSheet(context),
-                    child: Text(
-                      widget.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
-                  Text(
-                    widget.description,
-                    style: TextStyle(color: Colors.black54),
-                  ),
+                  Text(widget.description, style: TextStyle(color: Colors.black54)),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          color: Colors.teal,
-                        ),
+                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioPlayer.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(
-                            position.toString().split('.').first,
-                            style: TextStyle(color: Colors.black54),
-                          );
+                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
                         },
                       ),
                       Expanded(
@@ -218,14 +198,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max:
-                                      duration.inMilliseconds.toDouble() > 0
-                                          ? duration.inMilliseconds.toDouble()
-                                          : 1.0,
+                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(
-                                      Duration(milliseconds: value.toInt()),
-                                    );
+                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
                                   },
                                   activeColor: Colors.teal,
                                   inactiveColor: Colors.teal.shade100,
@@ -245,19 +220,10 @@ class _MusicPlayerState extends State<MusicPlayer> {
               children: [
                 Icon(Icons.share, color: Colors.teal),
                 SizedBox(height: 8),
-                IconButton(
-                  icon: Icon(
-                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.teal,
-                  ),
-                  onPressed: widget.onToggleLike,
-                ),
+                IconButton(icon: Icon(widget.isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.teal), onPressed: widget.onToggleLike),
                 SizedBox(height: 8),
                 IconButton(
-                  icon: Icon(
-                    _inAlbum ? Icons.bookmark : Icons.bookmark_border,
-                    color: Colors.teal,
-                  ),
+                  icon: Icon(_inAlbum ? Icons.bookmark : Icons.bookmark_border, color: Colors.teal),
                   onPressed: () {
                     if (_inAlbum) {
                       _removeFromAlbum();

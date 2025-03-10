@@ -22,6 +22,11 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
     _fetchLikedSongs();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchLikedSongs() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
@@ -29,10 +34,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/liked_music'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/liked_music'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -54,10 +56,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/unlike_music/$songId'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.post(Uri.parse('http://10.50.80.162:5000/unlike_music/$songId'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -72,10 +71,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Bài hát yêu thích',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Bài hát yêu thích', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
       ),
@@ -91,8 +87,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
                     final name = song['user_name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
                     // Since this is the liked screen, we assume everything is liked.
-                    final url =
-                        'http://127.0.0.1:5000/get_music_file/${song['id']}';
+                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
 
                     return LikedMusicPlayer(
                       id: song['id'],

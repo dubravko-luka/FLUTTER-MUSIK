@@ -25,16 +25,18 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
     _fetchSongs();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchSongs() async {
     String? token = await storage.read(key: "authToken");
     if (token == null) {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_album_music/${widget.albumId}'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_album_music/${widget.albumId}'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -45,9 +47,7 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to load songs')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load songs')));
     }
   }
 
@@ -60,14 +60,7 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Album Music',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text('Album Music', style: TextStyle(fontWeight: FontWeight.bold)), backgroundColor: Colors.teal, elevation: 0),
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
@@ -79,8 +72,7 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
                     final song = _songs[index];
                     final name = song['user_name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
-                    final url =
-                        'http://127.0.0.1:5000/get_music_file/${song['id']}';
+                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
 
                     return AlbumMusicPlayer(
                       id: song['id'],

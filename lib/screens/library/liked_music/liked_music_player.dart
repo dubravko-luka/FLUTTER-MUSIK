@@ -45,7 +45,7 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
     try {
       await _audioPlayer.setUrl(widget.url);
     } catch (e) {
-      print("Error setting URL: $e");
+      print("Error setting URL liked music player: $e");
     }
   }
 
@@ -106,44 +106,26 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: Colors.teal.shade100,
-              child: Icon(Icons.person, color: Colors.teal, size: 30),
-            ),
+            CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    widget.description,
-                    style: TextStyle(color: Colors.black54),
-                  ),
+                  Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(widget.description, style: TextStyle(color: Colors.black54)),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          color: Colors.teal,
-                        ),
+                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioPlayer.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(
-                            position.toString().split('.').first,
-                            style: TextStyle(color: Colors.black54),
-                          );
+                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
                         },
                       ),
                       Expanded(
@@ -157,14 +139,9 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max:
-                                      duration.inMilliseconds.toDouble() > 0
-                                          ? duration.inMilliseconds.toDouble()
-                                          : 1.0,
+                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(
-                                      Duration(milliseconds: value.toInt()),
-                                    );
+                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
                                   },
                                   activeColor: Colors.teal,
                                   inactiveColor: Colors.teal.shade100,
@@ -182,13 +159,7 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: Icon(
-                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.teal,
-                  ),
-                  onPressed: widget.onToggleLike,
-                ),
+                IconButton(icon: Icon(widget.isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.teal), onPressed: widget.onToggleLike),
               ],
             ),
           ],

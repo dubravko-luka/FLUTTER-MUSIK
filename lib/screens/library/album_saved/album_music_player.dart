@@ -49,7 +49,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
     try {
       await _audioPlayer.setUrl(widget.url);
     } catch (e) {
-      print("Error setting URL: $e");
+      print("Error setting URL album music player: $e");
     }
   }
 
@@ -101,7 +101,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
       return;
     }
 
-    final url = Uri.parse('http://127.0.0.1:5000/remove_music_from_album');
+    final url = Uri.parse('http://10.50.80.162:5000/remove_music_from_album');
     final response = await http.delete(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
@@ -117,9 +117,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -138,44 +136,26 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: Colors.teal.shade100,
-              child: Icon(Icons.person, color: Colors.teal, size: 30),
-            ),
+            CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.name,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    widget.description,
-                    style: TextStyle(color: Colors.black54),
-                  ),
+                  Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(widget.description, style: TextStyle(color: Colors.black54)),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          color: Colors.teal,
-                        ),
+                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioPlayer.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(
-                            position.toString().split('.').first,
-                            style: TextStyle(color: Colors.black54),
-                          );
+                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
                         },
                       ),
                       Expanded(
@@ -189,14 +169,9 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max:
-                                      duration.inMilliseconds.toDouble() > 0
-                                          ? duration.inMilliseconds.toDouble()
-                                          : 1.0,
+                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(
-                                      Duration(milliseconds: value.toInt()),
-                                    );
+                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
                                   },
                                   activeColor: Colors.teal,
                                   inactiveColor: Colors.teal.shade100,
@@ -211,15 +186,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
                 ],
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.bookmark, color: Colors.teal),
-                  onPressed: _removeMusic,
-                ),
-              ],
-            ),
+            Column(mainAxisSize: MainAxisSize.min, children: [IconButton(icon: Icon(Icons.bookmark, color: Colors.teal), onPressed: _removeMusic)]),
           ],
         ),
       ),

@@ -1,6 +1,5 @@
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:just_audio/just_audio.dart'; // sử dụng audioplayer để phát âm thanh
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
@@ -12,8 +11,8 @@ class UploadMusicScreen extends StatefulWidget {
 
 class _UploadMusicScreenState extends State<UploadMusicScreen> {
   String _selectedFile = 'No file selected.';
-  FilePickerResult? _file;
-  AudioPlayer _audioPlayer = AudioPlayer();
+  html.File? _file;
+  html.AudioElement? _audioElement;
   TextEditingController _descriptionController = TextEditingController();
   final storage = FlutterSecureStorage();
   bool _isLoading = false;
@@ -21,36 +20,46 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
 
-  void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['mp3']);
+  void _pickFile() {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement()..accept = '.mp3';
+    uploadInput.click();
 
-    if (result != null) {
-      _file = result;
-      setState(() {
-        _selectedFile = _file!.files.single.name;
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      if (files!.isEmpty) return;
+
+      _file = files[0];
+      final reader = html.FileReader();
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _selectedFile = _file!.name;
+          _setupAudioElement();
+        });
       });
-      _setupAudioElement();
-    } else {
-      // User canceled the picker
-    }
+
+      reader.readAsDataUrl(_file!);
+    });
   }
 
-  void _setupAudioElement() async {
-    if (_file != null) {
-      await _audioPlayer.setFilePath(_file!.files.single.path!);
-      _audioPlayer.positionStream.listen((position) {
-        setState(() {
-          _position = position;
-          _progress = position.inMilliseconds / _audioPlayer.duration!.inMilliseconds;
-        });
-      });
-
-      _audioPlayer.durationStream.listen((duration) {
-        setState(() {
-          _duration = duration ?? Duration.zero;
-        });
-      });
-    }
+  void _setupAudioElement() {
+    final url = html.Url.createObjectUrl(_file);
+    _audioElement =
+        html.AudioElement()
+          ..src = url
+          ..onLoadedMetadata.listen((event) {
+            setState(() {
+              _duration = Duration(seconds: _audioElement?.duration?.toInt() ?? 0);
+            });
+          })
+          ..onTimeUpdate.listen((event) {
+            if (mounted && _audioElement != null) {
+              setState(() {
+                _position = Duration(seconds: _audioElement!.currentTime.toInt());
+                _progress = _audioElement!.currentTime / (_audioElement!.duration ?? 1);
+              });
+            }
+          });
   }
 
   Future<void> _uploadMusic() async {
@@ -75,20 +84,24 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
           ..headers['Authorization'] = token
           ..fields['description'] = _descriptionController.text;
 
-    request.files.add(await http.MultipartFile.fromPath('file', _file!.files.single.path!));
+    final reader = html.FileReader();
+    reader.readAsArrayBuffer(_file!);
+    reader.onLoadEnd.listen((e) async {
+      request.files.add(http.MultipartFile.fromBytes('file', reader.result as List<int>, filename: _file!.name));
 
-    final response = await request.send();
+      final response = await request.send();
 
-    setState(() {
-      _isLoading = false;
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response.statusCode == 201) {
+        _showMessage('Music uploaded successfully.');
+        _resetForm();
+      } else {
+        _showMessage('Failed to upload music');
+      }
     });
-
-    if (response.statusCode == 201) {
-      _showMessage('Music uploaded successfully.');
-      _resetForm();
-    } else {
-      _showMessage('Failed to upload music');
-    }
   }
 
   void _showMessage(String message) {
@@ -106,8 +119,9 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   void _resetForm() {
     setState(() {
       _selectedFile = 'No file selected.';
-      _audioPlayer.pause();
-      _audioPlayer.stop();
+      _audioElement?.pause();
+      _audioElement?.src = ''; // Reset audio source
+      _audioElement = null;
       _file = null;
       _descriptionController.clear();
       _progress = 0.0;
@@ -123,15 +137,15 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   }
 
   void _playMusic() {
-    _audioPlayer.play();
+    _audioElement?.play();
   }
 
   void _pauseMusic() {
-    _audioPlayer.pause();
+    _audioElement?.pause();
   }
 
   void _seekMusic(double seconds) {
-    _audioPlayer.seek(Duration(seconds: seconds.toInt()));
+    _audioElement?.currentTime = seconds;
   }
 
   Future<bool> _onWillPop() async {
@@ -244,12 +258,12 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     return Row(
       children: [
         IconButton(
-          icon: Icon(_audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow),
+          icon: Icon(_audioElement?.paused ?? true ? Icons.play_arrow : Icons.pause),
           onPressed: () {
-            if (_audioPlayer.playerState.playing) {
-              _pauseMusic();
-            } else {
+            if (_audioElement?.paused ?? true) {
               _playMusic();
+            } else {
+              _pauseMusic();
             }
           },
         ),

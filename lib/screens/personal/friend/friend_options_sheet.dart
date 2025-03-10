@@ -41,9 +41,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.get(
-      Uri.parse(
-        'http://127.0.0.1:5000/get_user_profile/${widget.profileUserId}',
-      ),
+      Uri.parse('http://10.50.80.162:5000/get_user_profile/${widget.profileUserId}'),
       headers: {'Authorization': token},
     );
 
@@ -65,7 +63,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://127.0.0.1:5000/delete_friend'),
+      Uri.parse('http://10.50.80.162:5000/delete_friend'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'friend_id': widget.profileUserId}),
     );
@@ -98,38 +96,20 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        color: Colors.white,
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(20)), color: Colors.white),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundImage: NetworkImage(widget.avatarUrl),
-          ),
+          CircleAvatar(radius: 40, backgroundImage: NetworkImage(widget.avatarUrl)),
           SizedBox(height: 12),
-          Text(
-            widget.name,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.teal,
-            ),
-          ),
+          Text(widget.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
           SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               if (!isOwnProfile) ...[
                 if (isFriend)
-                  IconButton(
-                    onPressed: _removeFriend,
-                    icon: Icon(Icons.person_remove, color: Colors.teal),
-                    tooltip: 'Remove Friend',
-                    iconSize: 36,
-                  ),
+                  IconButton(onPressed: _removeFriend, icon: Icon(Icons.person_remove, color: Colors.teal), tooltip: 'Remove Friend', iconSize: 36),
                 IconButton(
                   onPressed: () {
                     Navigator.pop(context);

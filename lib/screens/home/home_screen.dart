@@ -28,10 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_music'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_music'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -60,10 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final endpoint = isLiked ? '/unlike_music/$songId' : '/like_music/$songId';
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000$endpoint'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.post(Uri.parse('http://10.50.80.162:5000$endpoint'), headers: {'Authorization': token});
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       setState(() {
@@ -81,13 +75,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Musik',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.teal,
         elevation: 0,
       ),
@@ -104,8 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final description = song['description'] ?? 'No Description';
                     final isLiked = song['liked'] ?? false;
                     final inAlbum = song['in_album'] ?? false;
-                    final url =
-                        'http://127.0.0.1:5000/get_music_file/${song['id']}';
+                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
 
                     return MusicPlayer(
                       id: song['id'],

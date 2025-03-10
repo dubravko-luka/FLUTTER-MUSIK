@@ -28,24 +28,14 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_albums'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_albums'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       setState(() {
         albums =
             data
-                .map(
-                  (album) => {
-                    'id': album['id'],
-                    'name': album['name'],
-                    'created_at': album['created_at'],
-                    'track_count': album['track_count'],
-                  },
-                )
+                .map((album) => {'id': album['id'], 'name': album['name'], 'created_at': album['created_at'], 'track_count': album['track_count']})
                 .toList();
         _isLoading = false;
       });
@@ -55,19 +45,14 @@ class _AlbumScreenState extends State<AlbumScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Album đã lưu',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Album đã lưu', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
       ),
@@ -85,11 +70,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 16, mainAxisSpacing: 16),
                     itemCount: albums.length,
                     itemBuilder: (context, index) {
                       return _buildAlbumCard(albums[index]);
@@ -119,14 +100,8 @@ class _AlbumScreenState extends State<AlbumScreen> {
             controller: albumNameController,
             decoration: InputDecoration(
               hintText: 'Enter album name',
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
-              ),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.teal)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.teal)),
             ),
           ),
           actions: <Widget>[
@@ -158,7 +133,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final url = Uri.parse('http://127.0.0.1:5000/create_album');
+    final url = Uri.parse('http://10.50.80.162:5000/create_album');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
@@ -174,9 +149,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
   }
 
   void _showEditAlbumDialog(int albumId, String currentName) {
-    TextEditingController albumNameController = TextEditingController(
-      text: currentName,
-    );
+    TextEditingController albumNameController = TextEditingController(text: currentName);
 
     showDialog(
       context: context,
@@ -189,14 +162,8 @@ class _AlbumScreenState extends State<AlbumScreen> {
             controller: albumNameController,
             decoration: InputDecoration(
               hintText: 'Enter new album name',
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
-              ),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.teal)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.teal)),
             ),
           ),
           actions: <Widget>[
@@ -228,7 +195,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final url = Uri.parse('http://127.0.0.1:5000/edit_album_name');
+    final url = Uri.parse('http://10.50.80.162:5000/edit_album_name');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
@@ -250,12 +217,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AlbumMusicScreen(albumId: album['id']),
-          ),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (context) => AlbumMusicScreen(albumId: album['id'])));
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -268,25 +230,13 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 children: [
                   Text(
                     album['name'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 8),
-                  Text(
-                    format.format(createdAt),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    textAlign: TextAlign.center,
-                  ),
+                  Text(format.format(createdAt), style: TextStyle(fontSize: 14, color: Colors.grey[700]), textAlign: TextAlign.center),
                   SizedBox(height: 8),
-                  Text(
-                    '$trackCount track(s)',
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
-                    textAlign: TextAlign.center,
-                  ),
+                  Text('$trackCount track(s)', style: TextStyle(fontSize: 12, color: Colors.black54), textAlign: TextAlign.center),
                 ],
               ),
             ),

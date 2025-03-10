@@ -21,16 +21,18 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
     _fetchSongs();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _fetchSongs() async {
     String? token = await storage.read(key: "authToken");
     if (token == null) {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/my_music'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/my_music'), headers: {'Authorization': token});
     if (response.statusCode == 200) {
       setState(() {
         _songs = jsonDecode(response.body);
@@ -48,10 +50,7 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Nhạc của tôi',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Nhạc của tôi', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
       ),
@@ -66,8 +65,7 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
                     final song = _songs[index];
                     final name = song['name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
-                    final url =
-                        'http://127.0.0.1:5000/get_music_file/${song['id']}';
+                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
 
                     return MyMusicPlayer(
                       id: song['id'],

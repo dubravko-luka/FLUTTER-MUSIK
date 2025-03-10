@@ -95,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = _emailController.text;
     final password = _passwordController.text;
 
-    final url = 'http://127.0.0.1:5000/register'; // Thay thế <your_backend_url> với địa chỉ backend của bạn
+    final url = 'http://10.50.80.162:5000/register'; // Thay thế <your_backend_url> với địa chỉ backend của bạn
 
     final response = await http.post(
       Uri.parse(url),

@@ -27,24 +27,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_friends'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_friends'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       setState(() {
-        friends =
-            data
-                .map(
-                  (friend) => {
-                    'id': friend['id'],
-                    'name': friend['name'],
-                    'email': friend['email'],
-                  },
-                )
-                .toList();
+        friends = data.map((friend) => {'id': friend['id'], 'name': friend['name'], 'email': friend['email']}).toList();
         isLoading = false;
       });
     } else {
@@ -53,25 +41,17 @@ class _FriendsScreenState extends State<FriendsScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _showOptionsBottomSheet(
-    BuildContext context,
-    Map<String, dynamic> friend,
-  ) {
+  void _showOptionsBottomSheet(BuildContext context, Map<String, dynamic> friend) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
         return FriendOptionsSheet(
           name: friend['name'],
-          avatarUrl:
-              "https://via.placeholder.com/150", // Use an actual image URL
+          avatarUrl: "https://via.placeholder.com/150", // Use an actual image URL
           profileUserId: friend['id'],
           onFriendRemoved: _fetchFriends, // Pass the callback
         );
@@ -111,26 +91,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
                     final friend = friends[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
                         leading: CircleAvatar(
                           radius: 25,
                           backgroundColor: Colors.teal,
-                          child: Text(
-                            friend['name'][0],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: Text(friend['name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
-                        title: Text(
-                          friend['name'],
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        title: Text(friend['name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(friend['email']),
                         trailing: IconButton(
                           icon: Icon(Icons.more_vert, color: Colors.teal),
