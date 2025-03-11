@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:musik/common/config.dart';
 
 void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback onAddedToAlbum) async {
   final storage = FlutterSecureStorage();
@@ -11,7 +12,7 @@ void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback on
     return;
   }
 
-  final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_albums'), headers: {'Authorization': token});
+  final response = await http.get(Uri.parse('$baseUrl/list_albums'), headers: {'Authorization': token});
 
   if (response.statusCode == 200) {
     final List<dynamic> albums = jsonDecode(response.body);
@@ -52,7 +53,7 @@ Future<void> addMusicToAlbum(BuildContext context, int albumId, int musicId, Voi
     return;
   }
 
-  final url = Uri.parse('http://10.50.80.162:5000/add_music_to_album');
+  final url = Uri.parse('$baseUrl/add_music_to_album');
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json', 'Authorization': token},

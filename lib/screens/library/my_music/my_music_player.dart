@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'dart:convert';
 import 'package:just_audio/just_audio.dart';
+import 'package:musik/common/config.dart';
 
 class MyMusicPlayer extends StatefulWidget {
   final int id;
@@ -67,10 +68,7 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
       return;
     }
 
-    final response = await http.delete(
-      Uri.parse('http://127.0.0.1:5000/delete_music/${widget.id}'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.delete(Uri.parse('$baseUrl/delete_music/${widget.id}'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       widget.onDelete(); // Invoke callback on successful deletion

@@ -4,6 +4,8 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:musik/common/config.dart';
+
 class FriendRequestsScreen extends StatefulWidget {
   @override
   _FriendRequestsScreenState createState() => _FriendRequestsScreenState();
@@ -27,7 +29,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_friend_requests'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/list_friend_requests'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -58,7 +60,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.50.80.162:5000/accept_friend_request'),
+      Uri.parse('$baseUrl/accept_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': requestId}),
     );
@@ -82,7 +84,7 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.50.80.162:5000/decline_friend_request'),
+      Uri.parse('$baseUrl/decline_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': requestId}),
     );

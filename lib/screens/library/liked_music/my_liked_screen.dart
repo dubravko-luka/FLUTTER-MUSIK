@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:musik/common/config.dart';
 import 'dart:convert';
 
 import 'liked_music_player.dart';
@@ -34,7 +35,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/liked_music'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/liked_music'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -56,7 +57,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.post(Uri.parse('http://10.50.80.162:5000/unlike_music/$songId'), headers: {'Authorization': token});
+    final response = await http.post(Uri.parse('$baseUrl/unlike_music/$songId'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       setState(() {
@@ -87,7 +88,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
                     final name = song['user_name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
                     // Since this is the liked screen, we assume everything is liked.
-                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
+                    final url = '$baseUrl/get_music_file/${song['id']}';
 
                     return LikedMusicPlayer(
                       id: song['id'],

@@ -4,6 +4,8 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:musik/common/config.dart';
+
 class FriendOptionsSheet extends StatefulWidget {
   final String name;
   final String avatarUrl;
@@ -35,10 +37,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
       return;
     }
 
-    final response = await http.get(
-      Uri.parse('http://10.50.80.162:5000/get_user_profile/${widget.profileUserId}'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('$baseUrl/get_user_profile/${widget.profileUserId}'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -59,7 +58,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.50.80.162:5000/send_friend_request'),
+      Uri.parse('$baseUrl/send_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'recipient_id': widget.profileUserId}),
     );
@@ -76,7 +75,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://10.50.80.162:5000/delete_friend_request'),
+      Uri.parse('$baseUrl/delete_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': friendRequestId}),
     );
@@ -93,7 +92,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://10.50.80.162:5000/delete_friend'),
+      Uri.parse('$baseUrl/delete_friend'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'friend_id': widget.profileUserId}),
     );
@@ -116,7 +115,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
     }
 
     final response = await http.post(
-      Uri.parse('http://10.50.80.162:5000/accept_friend_request'),
+      Uri.parse('$baseUrl/accept_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': friendRequestId}),
     );

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:musik/common/config.dart';
 import 'album_music_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,7 +29,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_albums'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/list_albums'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -133,7 +134,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final url = Uri.parse('http://10.50.80.162:5000/create_album');
+    final url = Uri.parse('$baseUrl/create_album');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},
@@ -195,7 +196,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
       return;
     }
 
-    final url = Uri.parse('http://10.50.80.162:5000/edit_album_name');
+    final url = Uri.parse('$baseUrl/edit_album_name');
     final response = await http.put(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},

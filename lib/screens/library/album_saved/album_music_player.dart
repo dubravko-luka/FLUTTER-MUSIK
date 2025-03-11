@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:musik/common/config.dart';
+
 class AlbumMusicPlayer extends StatefulWidget {
   final int id;
   final int albumId;
@@ -101,7 +103,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
       return;
     }
 
-    final url = Uri.parse('http://10.50.80.162:5000/remove_music_from_album');
+    final url = Uri.parse('$baseUrl/remove_music_from_album');
     final response = await http.delete(
       url,
       headers: {'Content-Type': 'application/json', 'Authorization': token},

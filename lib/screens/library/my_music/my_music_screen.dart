@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:musik/common/config.dart';
 import 'my_music_player.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -32,7 +33,7 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/my_music'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/my_music'), headers: {'Authorization': token});
     if (response.statusCode == 200) {
       setState(() {
         _songs = jsonDecode(response.body);
@@ -65,7 +66,7 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
                     final song = _songs[index];
                     final name = song['name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
-                    final url = 'http://10.50.80.162:5000/get_music_file/${song['id']}';
+                    final url = '$baseUrl/get_music_file/${song['id']}';
 
                     return MyMusicPlayer(
                       id: song['id'],

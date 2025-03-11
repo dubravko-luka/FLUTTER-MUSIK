@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:musik/common/config.dart';
 import 'dart:convert';
 import 'friend_options_sheet.dart';
 
@@ -27,7 +28,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/list_friends'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/list_friends'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);

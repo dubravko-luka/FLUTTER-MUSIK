@@ -4,10 +4,11 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:musik/common/config.dart';
+
 class SentFriendRequestsScreen extends StatefulWidget {
   @override
-  _SentFriendRequestsScreenState createState() =>
-      _SentFriendRequestsScreenState();
+  _SentFriendRequestsScreenState createState() => _SentFriendRequestsScreenState();
 }
 
 class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
@@ -29,7 +30,7 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
     }
 
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/list_sent_friend_requests'),
+      Uri.parse('$baseUrl/list_sent_friend_requests'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
     );
 
@@ -62,16 +63,14 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
     }
 
     final response = await http.delete(
-      Uri.parse('http://127.0.0.1:5000/delete_friend_request'),
+      Uri.parse('$baseUrl/delete_friend_request'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
       body: jsonEncode({'request_id': requestId}),
     );
 
     if (response.statusCode == 200) {
       setState(() {
-        sentRequests.removeWhere(
-          (request) => request['request_id'] == requestId,
-        );
+        sentRequests.removeWhere((request) => request['request_id'] == requestId);
       });
       _showMessage('Friend request cancelled');
     } else {
@@ -123,26 +122,15 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
                     final request = sentRequests[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
                         leading: CircleAvatar(
                           radius: 25,
                           backgroundColor: Colors.teal,
-                          child: Text(
-                            request['recipient_name'][0],
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: Text(request['recipient_name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
-                        title: Text(
-                          request['recipient_name'],
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        title: Text(request['recipient_name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(request['recipient_email']),
                         trailing: IconButton(
                           icon: Icon(Icons.cancel, color: Colors.red),

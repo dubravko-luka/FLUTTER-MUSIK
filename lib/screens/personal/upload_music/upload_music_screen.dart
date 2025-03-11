@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart'; // sử dụng audioplayer để ph
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:musik/common/config.dart';
 
 class UploadMusicScreen extends StatefulWidget {
   @override
@@ -69,7 +70,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
       return;
     }
 
-    final uri = Uri.parse('http://10.50.80.162:5000/upload_music');
+    final uri = Uri.parse('$baseUrl/upload_music');
     final request =
         http.MultipartRequest('POST', uri)
           ..headers['Authorization'] = token

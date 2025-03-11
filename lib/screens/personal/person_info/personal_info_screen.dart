@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:musik/common/config.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('http://10.50.80.162:5000/user_info'), headers: {'Authorization': token});
+    final response = await http.get(Uri.parse('$baseUrl/user_info'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
