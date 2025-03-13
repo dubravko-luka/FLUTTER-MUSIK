@@ -5,12 +5,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:musik/common/config.dart';
 
-class UploadMusicScreen extends StatefulWidget {
+class UploadMusicWebScreen extends StatefulWidget {
   @override
-  _UploadMusicScreenState createState() => _UploadMusicScreenState();
+  _UploadMusicWebScreenState createState() => _UploadMusicWebScreenState();
 }
 
-class _UploadMusicScreenState extends State<UploadMusicScreen> {
+class _UploadMusicWebScreenState extends State<UploadMusicWebScreen> {
   String _selectedFile = 'No file selected.';
   html.File? _file;
   html.AudioElement? _audioElement;
@@ -22,7 +22,8 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   Duration _position = Duration.zero;
 
   void _pickFile() {
-    html.FileUploadInputElement uploadInput = html.FileUploadInputElement()..accept = '.mp3';
+    html.FileUploadInputElement uploadInput =
+        html.FileUploadInputElement()..accept = '.mp3';
     uploadInput.click();
 
     uploadInput.onChange.listen((e) {
@@ -50,14 +51,19 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
           ..src = url
           ..onLoadedMetadata.listen((event) {
             setState(() {
-              _duration = Duration(seconds: _audioElement?.duration?.toInt() ?? 0);
+              _duration = Duration(
+                seconds: _audioElement?.duration?.toInt() ?? 0,
+              );
             });
           })
           ..onTimeUpdate.listen((event) {
             if (mounted && _audioElement != null) {
               setState(() {
-                _position = Duration(seconds: _audioElement!.currentTime.toInt());
-                _progress = _audioElement!.currentTime / (_audioElement!.duration ?? 1);
+                _position = Duration(
+                  seconds: _audioElement!.currentTime.toInt(),
+                );
+                _progress =
+                    _audioElement!.currentTime / (_audioElement!.duration ?? 1);
               });
             }
           });
@@ -88,7 +94,13 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     final reader = html.FileReader();
     reader.readAsArrayBuffer(_file!);
     reader.onLoadEnd.listen((e) async {
-      request.files.add(http.MultipartFile.fromBytes('file', reader.result as List<int>, filename: _file!.name));
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          reader.result as List<int>,
+          filename: _file!.name,
+        ),
+      );
 
       final response = await request.send();
 
@@ -154,13 +166,24 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           backgroundColor: Colors.tealAccent.shade100,
           title: Text('Confirm', style: TextStyle(color: Colors.teal)),
-          content: Text('Do you really want to exit?', style: TextStyle(color: Colors.black87)),
+          content: Text(
+            'Do you really want to exit?',
+            style: TextStyle(color: Colors.black87),
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Cancel', style: TextStyle(color: Colors.teal))),
-            TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text('OK', style: TextStyle(color: Colors.teal))),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel', style: TextStyle(color: Colors.teal)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('OK', style: TextStyle(color: Colors.teal)),
+            ),
           ],
         );
       },
@@ -200,7 +223,9 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -212,8 +237,13 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                         decoration: InputDecoration(
                           labelText: 'Select Music File',
                           prefixIcon: Icon(Icons.upload_file),
-                          suffixIcon: _file != null ? Icon(Icons.check, color: Colors.green) : null,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          suffixIcon:
+                              _file != null
+                                  ? Icon(Icons.check, color: Colors.green)
+                                  : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         readOnly: true,
                         controller: TextEditingController(text: _selectedFile),
@@ -227,7 +257,9 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                         decoration: InputDecoration(
                           labelText: 'Describe your mood',
                           prefixIcon: Icon(Icons.edit),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         maxLines: 3,
                       ),
@@ -237,10 +269,18 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                           : ElevatedButton(
                             onPressed: _uploadMusic,
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 50,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                               backgroundColor: Colors.teal,
-                              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              textStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             child: Text('Upload'),
                           ),
@@ -259,7 +299,9 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     return Row(
       children: [
         IconButton(
-          icon: Icon(_audioElement?.paused ?? true ? Icons.play_arrow : Icons.pause),
+          icon: Icon(
+            _audioElement?.paused ?? true ? Icons.play_arrow : Icons.pause,
+          ),
           onPressed: () {
             if (_audioElement?.paused ?? true) {
               _playMusic();

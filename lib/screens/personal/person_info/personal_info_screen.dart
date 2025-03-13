@@ -2,7 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:musik/common/config.dart';
+import 'dart:typed_data';
+
+import 'package:musik/services/auth_service.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   @override
@@ -11,9 +16,13 @@ class PersonalInfoScreen extends StatefulWidget {
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   final storage = FlutterSecureStorage();
+  final picker = ImagePicker();
   String? _name;
   String? _email;
+  String? _avatarUrl;
+  int? _userId; // Add _userId here
   bool _isLoading = true;
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -24,23 +33,139 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   Future<void> _fetchUserInfo() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      // Handle missing token (e.g., redirect to login)
+      _showMessage('Token not found');
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/user_info'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_info'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
+        _userId = data['id']; // Initialize _userId
         _name = data['name'];
         _email = data['email'];
+        _avatarUrl = '${baseUrl}/get_avatar/$_userId';
         _isLoading = false;
       });
     } else {
-      // Handle error
-      print("Failed to load user info");
+      _showMessage('Failed to load user info');
     }
+  }
+
+  Future<void> _uploadAvatar() async {
+    try {
+      final token = await storage.read(key: 'authToken');
+      if (token == null) {
+        _showMessage('Token not found');
+        return;
+      }
+
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      Uint8List fileBytes = await pickedFile.readAsBytes();
+      String fileName = pickedFile.name;
+
+      var request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/upload_avatar'))
+            ..headers['Authorization'] = token
+            ..files.add(
+              http.MultipartFile.fromBytes(
+                'avatar',
+                fileBytes,
+                filename: fileName,
+              ),
+            );
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 201) {
+        _showMessage('Avatar uploaded successfully');
+        setState(() {
+          _avatarUrl = generateAvatarUrl(_userId!); // Use _userId here
+        });
+        _authService.fetchAndStoreUserInfo(token);
+      } else {
+        _showMessage('Failed to upload avatar');
+      }
+    } catch (e) {
+      _showMessage('Error: ${e.toString()}');
+    }
+  }
+
+  Future<void> _updateName(String newName) async {
+    final token = await storage.read(key: 'authToken');
+    if (token == null) {
+      _showMessage('Token not found');
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/update_user_info'),
+      headers: {'Content-Type': 'application/json', 'Authorization': token},
+      body: jsonEncode({'name': newName, 'email': _email}),
+    );
+
+    if (response.statusCode == 200) {
+      _showMessage('Name updated successfully');
+      _fetchUserInfo();
+    } else {
+      _showMessage('Failed to update name');
+    }
+  }
+
+  void _showEditNameDialog() {
+    TextEditingController controller = TextEditingController(text: _name);
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            backgroundColor: Colors.tealAccent.shade100,
+            title: Text('Edit Name'),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(hintText: 'Enter your name'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  String newName = controller.text.trim();
+                  if (newName.isNotEmpty) _updateName(newName);
+                },
+                child: Text('Save'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  String generateAvatarUrl(int userId) {
+    return '$baseUrl/get_avatar/$userId?${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  void _showMessage(String message) {
+    showToast(
+      message,
+      context: context,
+      position: StyledToastPosition.top,
+      backgroundColor: Colors.black54,
+      animation: StyledToastAnimation.slideFromTop,
+      reverseAnimation: StyledToastAnimation.slideToTop,
+      duration: Duration(seconds: 3),
+    );
   }
 
   @override
@@ -52,9 +177,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body:
@@ -83,20 +206,30 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   CircleAvatar(
                                     radius: 60,
                                     backgroundColor: Colors.tealAccent.shade100,
-                                    child: CircleAvatar(
-                                      radius: 56,
-                                      backgroundColor: Colors.white,
-                                      child: Icon(Icons.person, size: 60, color: Colors.teal.shade600),
-                                    ),
+                                    backgroundImage:
+                                        _avatarUrl != null
+                                            ? NetworkImage(_avatarUrl!)
+                                            : null,
+                                    child:
+                                        _avatarUrl == null
+                                            ? Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.teal.shade600,
+                                            )
+                                            : null,
                                   ),
                                   Positioned(
                                     right: 0,
                                     bottom: 0,
                                     child: FloatingActionButton(
-                                      onPressed: () {},
+                                      onPressed: _uploadAvatar,
                                       mini: true,
                                       backgroundColor: Colors.teal,
-                                      child: Icon(Icons.edit, color: Colors.white),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -104,15 +237,23 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             SizedBox(height: 30),
                             Card(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
                               elevation: 5,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   children: [
-                                    _buildInfoRow('Name:', _name ?? 'Loading...'),
+                                    _buildEditableInfoRow(
+                                      'Name:',
+                                      _name ?? 'Loading...',
+                                    ),
                                     Divider(),
-                                    _buildInfoRow('Email:', _email ?? 'Loading...'),
+                                    _buildInfoRow(
+                                      'Email:',
+                                      _email ?? 'Loading...',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -127,12 +268,50 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
+  Widget _buildEditableInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.teal,
+          ),
+        ),
+        Row(
+          children: [
+            Text(
+              value,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit, color: Colors.teal),
+              onPressed: _showEditNameDialog,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.teal)),
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.teal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
       ],
     );
   }
