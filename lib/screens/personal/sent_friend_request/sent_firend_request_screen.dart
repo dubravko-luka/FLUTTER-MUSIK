@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/friend_options_sheet.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class SentFriendRequestsScreen extends StatefulWidget {
   @override
@@ -22,10 +23,19 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
     _fetchSentFriendRequests();
   }
 
+  void _showBottomSheet(BuildContext context, request) {
+    final avatar = '$baseUrl/get_avatar/${request['recipient_id']}';
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => FriendOptionsSheet(name: request['recipient_name'], avatarUrl: avatar, profileUserId: request['recipient_id']),
+    );
+  }
+
   Future<void> _fetchSentFriendRequests() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -51,14 +61,13 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
         isLoading = false;
       });
     } else {
-      _showMessage('Failed to load sent friend requests');
+      return;
     }
   }
 
   Future<void> _cancelSentRequest(int requestId) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -72,22 +81,10 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
       setState(() {
         sentRequests.removeWhere((request) => request['request_id'] == requestId);
       });
-      _showMessage('Friend request cancelled');
+      SuccessPopup(message: 'Hủy lời mời kết bạn thành công', outerContext: context).show();
     } else {
-      _showMessage('Failed to cancel friend request');
+      SuccessPopup(message: 'Vui lòng thử lại', outerContext: context).show(success: false);
     }
-  }
-
-  void _showMessage(String message) {
-    showToast(
-      message,
-      context: context,
-      position: StyledToastPosition.top,
-      backgroundColor: Colors.black54,
-      animation: StyledToastAnimation.slideFromTop,
-      reverseAnimation: StyledToastAnimation.slideToTop,
-      duration: Duration(seconds: 3),
-    );
   }
 
   @override
@@ -125,10 +122,9 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
-                        leading: CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.teal,
-                          child: Text(request['recipient_name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        leading: GestureDetector(
+                          onTap: () => _showBottomSheet(context, request),
+                          child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${request['recipient_id']}')),
                         ),
                         title: Text(request['recipient_name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(request['recipient_email']),

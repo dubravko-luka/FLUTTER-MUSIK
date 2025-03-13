@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musik/screens/main_screen.dart';
+import 'package:musik/services/auth_service.dart';
 import 'screens/auth/login/login_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -10,6 +11,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -17,19 +19,26 @@ class MyApp extends StatelessWidget {
       title: 'My App',
       theme: ThemeData(primarySwatch: Colors.teal),
       home: FutureBuilder<String?>(
-        future: storage.read(key: 'authToken'),
+        future: _checkAuthToken(),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data != null) {
-              return MainScreen(); // If token exists, show home screen
+            if (snapshot.hasData && snapshot.data != null) {
+              _authService.getUserInfo(snapshot.data!, context);
+              return MainScreen();
             } else {
-              return LoginScreen(); // Otherwise, show login screen
+              return LoginScreen();
             }
           } else {
-            return CircularProgressIndicator(); // Loading indicator
+            return Scaffold(
+              body: Center(child: CircularProgressIndicator()), // Loading indicator
+            );
           }
         },
       ),
     );
+  }
+
+  Future<String?> _checkAuthToken() async {
+    return await storage.read(key: 'authToken');
   }
 }

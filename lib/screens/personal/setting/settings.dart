@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'my_language_dialog.dart';
 import 'privacy_policy_screen.dart';
 import 'about_app_screen.dart';
-import '../../auth/login/login_screen.dart'; // Ensure you have a login screen
+import 'package:musik/services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -11,6 +11,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final AuthService _authService = AuthService();
   bool _notificationsEnabled = true; // Initial state for notifications
 
   @override
@@ -83,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               leading: Icon(Icons.logout, color: Colors.red),
               title: Text('Đăng xuất', style: TextStyle(color: Colors.red)),
               onTap: () async {
-                await _logout(context);
+                await _authService.logout(context);
               },
             ),
           ],
@@ -103,28 +104,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showPrivacySettings(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()));
   }
 
   void _showAboutApp(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AboutAppScreen()),
-    );
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear all saved data
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-      (Route<dynamic> route) => false,
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppScreen()));
   }
 
   Widget _buildSettingTile(
@@ -141,10 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: Icon(icon, color: Colors.teal),
-        title: Text(
-          title,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
+        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
         subtitle: subtitle != null ? Text(subtitle) : null,
         trailing: trailing,
         onTap: onTap,

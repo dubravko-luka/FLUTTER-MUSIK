@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class FriendOptionsSheet extends StatefulWidget {
   final String name;
@@ -102,9 +103,9 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
         isFriend = false;
       });
       Navigator.pop(context);
-      _showMessage('Friend deleted');
+      SuccessPopup(message: 'Xóa bạn thành công', outerContext: context).show();
     } else {
-      _showMessage('Failed to delete friend');
+      SuccessPopup(message: 'Không thể xóa nhạc', outerContext: context).show(success: false);
     }
   }
 
@@ -122,9 +123,9 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
 
     if (response.statusCode == 201) {
       _getProfileInfo();
-      _showMessage('Friend request accepted');
+      SuccessPopup(message: 'Gửi lời mời kết bạn thành công', outerContext: context).show();
     } else {
-      _showMessage('Failed to accept friend request');
+      SuccessPopup(message: 'Gửi lời mời kết bạn thất bại', outerContext: context).show(success: false);
     }
   }
 
@@ -161,15 +162,16 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                 ],
                 if (isFriend)
                   IconButton(onPressed: _removeFriend, icon: Icon(Icons.person_remove, color: Colors.teal), tooltip: 'Remove Friend', iconSize: 36),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Implement Send Message logic
-                  },
-                  icon: Icon(Icons.message, color: Colors.teal),
-                  tooltip: 'Send Message',
-                  iconSize: 36,
-                ),
+                if (isFriend)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // Implement Send Message logic
+                    },
+                    icon: Icon(Icons.message, color: Colors.teal),
+                    tooltip: 'Send Message',
+                    iconSize: 36,
+                  ),
               ],
               IconButton(
                 onPressed: () {
@@ -185,18 +187,6 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
           SizedBox(height: 16),
         ],
       ),
-    );
-  }
-
-  void _showMessage(String message) {
-    showToast(
-      message,
-      context: context,
-      position: StyledToastPosition.top,
-      backgroundColor: Colors.black54,
-      animation: StyledToastAnimation.slideFromTop,
-      reverseAnimation: StyledToastAnimation.slideToTop,
-      duration: Duration(seconds: 3),
     );
   }
 }

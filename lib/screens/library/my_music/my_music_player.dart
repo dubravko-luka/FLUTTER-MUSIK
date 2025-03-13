@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-import 'dart:convert';
 import 'package:just_audio/just_audio.dart';
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class MyMusicPlayer extends StatefulWidget {
   final int id;
   final String url;
+  final String avatar;
   final String name;
   final String description;
   final int currentPlayingId;
@@ -18,6 +18,7 @@ class MyMusicPlayer extends StatefulWidget {
   MyMusicPlayer({
     required this.id,
     required this.url,
+    required this.avatar,
     required this.name,
     required this.description,
     required this.currentPlayingId,
@@ -64,30 +65,17 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
   Future<void> _deleteMusic() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
     final response = await http.delete(Uri.parse('$baseUrl/delete_music/${widget.id}'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
-      widget.onDelete(); // Invoke callback on successful deletion
-      _showMessage('Music deleted successfully');
+      widget.onDelete();
+      SuccessPopup(message: 'Xóa thành công', outerContext: context).show();
     } else {
-      _showMessage('Failed to delete music');
+      SuccessPopup(message: 'Xóa thất bại', outerContext: context).show(success: false);
     }
-  }
-
-  void _showMessage(String message) {
-    showToast(
-      message,
-      context: context,
-      position: StyledToastPosition.top,
-      backgroundColor: Colors.black54,
-      animation: StyledToastAnimation.slideFromTop,
-      reverseAnimation: StyledToastAnimation.slideToTop,
-      duration: Duration(seconds: 3),
-    );
   }
 
   @override
@@ -139,7 +127,7 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
+            CircleAvatar(radius: 30, backgroundImage: NetworkImage(widget.avatar)),
             SizedBox(width: 16),
             Expanded(
               child: Column(

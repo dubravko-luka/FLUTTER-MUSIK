@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:musik/common/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:musik/utils/storage_util.dart';
+import 'package:musik/screens/auth/login/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final storage = FlutterSecureStorage();
@@ -31,10 +33,7 @@ class AuthService {
   }
 
   Future<bool> fetchAndStoreUserInfo(String token) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/user_info'),
-      headers: {'Authorization': token},
-    );
+    final response = await http.get(Uri.parse('$baseUrl/user_info'), headers: {'Authorization': token});
 
     if (response.statusCode == 200) {
       final userInfo = jsonDecode(response.body);
@@ -48,6 +47,14 @@ class AuthService {
     }
 
     return false;
+  }
+
+  Future<void> getUserInfo(String token, BuildContext context) async {
+    final response = await fetchAndStoreUserInfo(token);
+
+    if (!response) {
+      await handleInvalidToken(context);
+    }
   }
 
   Future<bool> register(String name, String email, String password) async {
@@ -64,5 +71,25 @@ class AuthService {
     }
 
     return false;
+  }
+
+  Future<void> logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen()), (Route<dynamic> route) => false);
+  }
+
+  Future<void> handleInvalidToken(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    // Call navigation only when the context is valid
+    _navigateToLogin(context);
+  }
+
+  void _navigateToLogin(BuildContext context) {
+    Future.microtask(() {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
+    });
   }
 }

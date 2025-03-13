@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback onAddedToAlbum) async {
   final storage = FlutterSecureStorage();
@@ -61,19 +61,7 @@ Future<void> addMusicToAlbum(BuildContext context, int albumId, int musicId, Voi
   );
 
   if (response.statusCode == 201) {
-    _showToastMessage(context, 'Music added to album successfully');
+    SuccessPopup(message: 'Thêm thành công', outerContext: context).show();
     onAddedToAlbum(); // Call the callback to update the state
   }
-}
-
-void _showToastMessage(BuildContext context, String message) {
-  showToast(
-    message,
-    context: context,
-    position: StyledToastPosition.top,
-    backgroundColor: Colors.black54,
-    animation: StyledToastAnimation.slideFromTop,
-    reverseAnimation: StyledToastAnimation.slideToTop,
-    duration: Duration(seconds: 3),
-  );
 }

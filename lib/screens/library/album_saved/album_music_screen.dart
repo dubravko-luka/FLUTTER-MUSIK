@@ -74,11 +74,13 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
                     final name = song['user_name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
                     final url = '$baseUrl/get_music_file/${song['id']}';
+                    final avatar = '$baseUrl/get_avatar/${song['user_id']}';
 
                     return AlbumMusicPlayer(
                       id: song['id'],
                       albumId: widget.albumId,
                       url: url,
+                      avatar: avatar,
                       name: name,
                       description: description,
                       currentPlayingId: _currentPlayingId,

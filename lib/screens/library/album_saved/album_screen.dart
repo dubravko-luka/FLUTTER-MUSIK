@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 import 'album_music_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -25,7 +26,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
   Future<void> _fetchAlbums() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -41,12 +41,8 @@ class _AlbumScreenState extends State<AlbumScreen> {
         _isLoading = false;
       });
     } else {
-      _showMessage('Failed to load albums');
+      return;
     }
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -115,7 +111,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
             ElevatedButton(
               onPressed: () async {
                 String albumName = albumNameController.text;
-                await _createAlbum(albumName);
+                _createAlbum(albumName);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
@@ -130,7 +126,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
   Future<void> _createAlbum(String albumName) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -142,10 +137,10 @@ class _AlbumScreenState extends State<AlbumScreen> {
     );
 
     if (response.statusCode == 201) {
-      _showMessage('Album created successfully');
+      SuccessPopup(message: 'Tạo album thành công', outerContext: context).show();
       _fetchAlbums();
     } else {
-      _showMessage('Failed to create album');
+      SuccessPopup(message: 'Tạo album thất bại', outerContext: context).show(success: false);
     }
   }
 
@@ -177,7 +172,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
             ElevatedButton(
               onPressed: () async {
                 String newName = albumNameController.text;
-                await _editAlbumName(albumId, newName);
+                _editAlbumName(albumId, newName);
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
@@ -192,7 +187,6 @@ class _AlbumScreenState extends State<AlbumScreen> {
   Future<void> _editAlbumName(int albumId, String newName) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -204,10 +198,10 @@ class _AlbumScreenState extends State<AlbumScreen> {
     );
 
     if (response.statusCode == 200) {
-      _showMessage('Album name updated successfully');
+      SuccessPopup(message: 'Cập nhật thành công', outerContext: context).show();
       _fetchAlbums();
     } else {
-      _showMessage('Failed to update album name');
+      SuccessPopup(message: 'Thất bại', outerContext: context).show(success: false);
     }
   }
 

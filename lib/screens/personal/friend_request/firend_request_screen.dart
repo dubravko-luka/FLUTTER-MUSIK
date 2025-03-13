@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/friend_options_sheet.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class FriendRequestsScreen extends StatefulWidget {
   @override
@@ -25,7 +25,6 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
   Future<void> _fetchFriendRequests() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -48,14 +47,13 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
         isLoading = false;
       });
     } else {
-      _showMessage('Failed to load friend requests');
+      return;
     }
   }
 
   Future<void> _acceptFriendRequest(int requestId) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -69,17 +67,16 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       setState(() {
         friendRequests.removeWhere((request) => request['request_id'] == requestId);
       });
-      _showMessage('Friend request accepted');
+      SuccessPopup(message: 'Chấp nhận thành công', outerContext: context).show();
     } else {
       _fetchFriendRequests();
-      _showMessage('Failed to accept friend request');
+      SuccessPopup(message: 'Chấp nhận thất bại', outerContext: context).show(success: false);
     }
   }
 
   Future<void> _declineFriendRequest(int requestId) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -93,22 +90,20 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       setState(() {
         friendRequests.removeWhere((request) => request['request_id'] == requestId);
       });
-      _showMessage('Friend request declined');
+      SuccessPopup(message: 'Từ chối thành công', outerContext: context).show();
     } else {
       _fetchFriendRequests();
-      _showMessage('Failed to decline friend request');
+      SuccessPopup(message: 'Từ chối thất bại', outerContext: context).show(success: false);
     }
   }
 
-  void _showMessage(String message) {
-    showToast(
-      message,
+  void _showBottomSheet(BuildContext context, request) {
+    final avatar = '$baseUrl/get_avatar/${request['requester_id']}';
+
+    showModalBottomSheet(
       context: context,
-      position: StyledToastPosition.top,
-      backgroundColor: Colors.black54,
-      animation: StyledToastAnimation.slideFromTop,
-      reverseAnimation: StyledToastAnimation.slideToTop,
-      duration: Duration(seconds: 3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => FriendOptionsSheet(name: request['requester_name'], avatarUrl: avatar, profileUserId: request['requester_id']),
     );
   }
 
@@ -147,10 +142,9 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
-                        leading: CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.teal,
-                          child: Text(request['requester_name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        leading: GestureDetector(
+                          onTap: () => _showBottomSheet(context, request),
+                          child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${request['requester_id']}')),
                         ),
                         title: Text(request['requester_name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(request['requester_email']),

@@ -24,7 +24,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
   Future<void> _fetchFriends() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -37,12 +36,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
         isLoading = false;
       });
     } else {
-      _showMessage('Failed to load friends');
+      return;
     }
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showOptionsBottomSheet(BuildContext context, Map<String, dynamic> friend) {
@@ -52,7 +47,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
       builder: (context) {
         return FriendOptionsSheet(
           name: friend['name'],
-          avatarUrl: "https://via.placeholder.com/150", // Use an actual image URL
+          avatarUrl: '$baseUrl/get_avatar/${friend['id']}',
           profileUserId: friend['id'],
           onFriendRemoved: _fetchFriends, // Pass the callback
         );
@@ -95,11 +90,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 5,
                       child: ListTile(
-                        leading: CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.teal,
-                          child: Text(friend['name'][0], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        ),
+                        leading: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${friend['id']}')),
                         title: Text(friend['name'], style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(friend['email']),
                         trailing: IconButton(

@@ -67,10 +67,12 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
                     final name = song['name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
                     final url = '$baseUrl/get_music_file/${song['id']}';
+                    final avatar = '$baseUrl/get_avatar/${song['user_id']}';
 
                     return MyMusicPlayer(
                       id: song['id'],
                       url: url,
+                      avatar: avatar,
                       name: name,
                       description: description,
                       currentPlayingId: _currentPlayingId,

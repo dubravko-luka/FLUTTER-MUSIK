@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadSongs() async {
     try {
-      final songs = await _musicService.fetchSongs();
+      final songs = await _musicService.fetchSongs(context);
       setState(() {
         _songs = songs;
         _isLoading = false;
@@ -61,10 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Musik',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.teal,
         elevation: 0,
       ),
@@ -81,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       id: song['id'],
                       url: '$baseUrl/get_music_file/${song['id']}',
                       name: song['user_name'] ?? 'Unknown Name',
+                      avatar: '$baseUrl/get_avatar/${song['user_id']}',
                       user_id: song['user_id'],
                       description: song['description'] ?? 'No Description',
                       currentPlayingId: _currentPlayingId,

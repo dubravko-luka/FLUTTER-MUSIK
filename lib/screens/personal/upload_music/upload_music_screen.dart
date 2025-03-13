@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:just_audio/just_audio.dart'; // sử dụng audioplayer để phát âm thanh
+import 'package:just_audio/just_audio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class UploadMusicScreen extends StatefulWidget {
   @override
@@ -56,7 +56,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
 
   Future<void> _uploadMusic() async {
     if (_file == null) {
-      _showMessage('No file selected');
+      SuccessPopup(message: 'Vui lòng chọn file nhạc', outerContext: context).show(success: false);
       return;
     }
 
@@ -66,7 +66,6 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
 
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -85,23 +84,11 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     });
 
     if (response.statusCode == 201) {
-      _showMessage('Music uploaded successfully.');
+      SuccessPopup(message: 'Đã tải nhạc lên thành công', outerContext: context).show();
       _resetForm();
     } else {
-      _showMessage('Failed to upload music');
+      SuccessPopup(message: 'Tải nhạc lên thất bại', outerContext: context).show(success: false);
     }
-  }
-
-  void _showMessage(String message) {
-    showToast(
-      message,
-      context: context,
-      position: StyledToastPosition.top,
-      backgroundColor: Colors.black54,
-      animation: StyledToastAnimation.slideFromTop,
-      reverseAnimation: StyledToastAnimation.slideToTop,
-      duration: Duration(seconds: 3),
-    );
   }
 
   void _resetForm() {

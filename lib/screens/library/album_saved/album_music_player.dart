@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
+import 'package:musik/widgets/success_popup.dart';
 
 class AlbumMusicPlayer extends StatefulWidget {
   final int id;
   final int albumId;
+  final String avatar;
   final String url;
   final String name;
   final String description;
@@ -19,6 +21,7 @@ class AlbumMusicPlayer extends StatefulWidget {
   AlbumMusicPlayer({
     required this.id,
     required this.albumId,
+    required this.avatar,
     required this.url,
     required this.name,
     required this.description,
@@ -99,7 +102,6 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
   Future<void> _removeMusic() async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
-      _showMessage('Authentication token not found');
       return;
     }
 
@@ -111,15 +113,11 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
     );
 
     if (response.statusCode == 200) {
-      _showMessage('Music removed successfully');
-      widget.onMusicRemoved(widget.id); // Update parent state
+      SuccessPopup(message: 'Xóa nhạc thành công', outerContext: context).show();
+      widget.onMusicRemoved(widget.id);
     } else {
-      _showMessage('Failed to remove music');
+      SuccessPopup(message: 'Không thể xóa nhạc', outerContext: context).show(success: false);
     }
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -138,7 +136,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
+            CircleAvatar(radius: 30, backgroundImage: NetworkImage(widget.avatar)),
             SizedBox(width: 16),
             Expanded(
               child: Column(

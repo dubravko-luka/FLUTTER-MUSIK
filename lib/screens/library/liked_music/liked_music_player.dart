@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 class LikedMusicPlayer extends StatefulWidget {
   final int id;
   final String url;
+  final String avatar;
   final String name;
   final String description;
   final int currentPlayingId;
@@ -14,6 +15,7 @@ class LikedMusicPlayer extends StatefulWidget {
   LikedMusicPlayer({
     required this.id,
     required this.url,
+    required this.avatar,
     required this.name,
     required this.description,
     required this.currentPlayingId,
@@ -106,7 +108,7 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(radius: 30, backgroundColor: Colors.teal.shade100, child: Icon(Icons.person, color: Colors.teal, size: 30)),
+            CircleAvatar(radius: 30, backgroundImage: NetworkImage(widget.avatar)),
             SizedBox(width: 16),
             Expanded(
               child: Column(

@@ -4,20 +4,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
-import 'package:musik/widgets/success_popup.dart';
 
 class FriendOptionsSheet extends StatefulWidget {
   final String name;
   final String avatarUrl;
   final int profileUserId;
-  final VoidCallback onFriendRemoved; // Added callback
 
-  FriendOptionsSheet({
-    required this.name,
-    required this.avatarUrl,
-    required this.profileUserId,
-    required this.onFriendRemoved, // Initialize callback
-  });
+  FriendOptionsSheet({required this.name, required this.avatarUrl, required this.profileUserId});
 
   @override
   _FriendOptionsSheetState createState() => _FriendOptionsSheetState();
@@ -27,6 +20,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
   bool isOwnProfile = false;
   bool isFriend = false;
   bool isFriendRequest = false;
+  String? friendRequestDirection;
   int? friendRequestId;
   final storage = FlutterSecureStorage();
 
@@ -51,31 +45,8 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
         isFriend = data['is_friend'];
         isFriendRequest = data['is_friend_request'];
         friendRequestId = data['friend_request_id'];
+        friendRequestDirection = data['friend_request_direction'];
       });
-    }
-  }
-
-  Future<void> _removeFriend() async {
-    final token = await storage.read(key: 'authToken');
-    if (token == null) {
-      return;
-    }
-
-    final response = await http.delete(
-      Uri.parse('$baseUrl/delete_friend'),
-      headers: {'Content-Type': 'application/json', 'Authorization': token},
-      body: jsonEncode({'friend_id': widget.profileUserId}),
-    );
-
-    if (response.statusCode == 200) {
-      setState(() {
-        isFriend = false;
-      });
-      widget.onFriendRemoved(); // Call the callback
-      Navigator.pop(context);
-      SuccessPopup(message: 'Xóa thành công', outerContext: context).show();
-    } else {
-      SuccessPopup(message: 'Xóa thất bại', outerContext: context).show(success: false);
     }
   }
 
@@ -94,19 +65,6 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              if (!isOwnProfile) ...[
-                if (isFriend)
-                  IconButton(onPressed: _removeFriend, icon: Icon(Icons.person_remove, color: Colors.teal), tooltip: 'Remove Friend', iconSize: 36),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Implement Send Message logic
-                  },
-                  icon: Icon(Icons.message, color: Colors.teal),
-                  tooltip: 'Send Message',
-                  iconSize: 36,
-                ),
-              ],
               IconButton(
                 onPressed: () {
                   Navigator.pop(context);

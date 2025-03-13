@@ -89,11 +89,13 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
                     final description = song['description'] ?? 'No Description';
                     // Since this is the liked screen, we assume everything is liked.
                     final url = '$baseUrl/get_music_file/${song['id']}';
+                    final avatar = '$baseUrl/get_avatar/${song['user_id']}';
 
                     return LikedMusicPlayer(
                       id: song['id'],
                       url: url,
                       name: name,
+                      avatar: avatar,
                       description: description,
                       currentPlayingId: _currentPlayingId,
                       setPlayingId: (int songId) {
