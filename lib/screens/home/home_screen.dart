@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:musik/common/config.dart';
 import 'package:musik/screens/music_player/music_player.dart';
+import 'package:musik/services/auth_service.dart';
 import 'package:musik/services/music_service.dart';
+import 'package:flutter/widgets.dart';
+
+final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+// Kế thừa từ RouteAware
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   final MusicService _musicService = MusicService();
+  final AuthService _authService = AuthService();
   List<dynamic> _songs = [];
   bool _isLoading = true;
   int _currentPlayingId = -1;
@@ -22,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadSongs() async {
     try {
+      setState(() {
+        _isLoading = true;
+      });
       final songs = await _musicService.fetchSongs(context);
       setState(() {
         _songs = songs;
@@ -31,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = false;
       });
-      // Handle error, for example by showing a dialog
     }
   }
 
@@ -48,20 +56,41 @@ class _HomeScreenState extends State<HomeScreen> {
             }).toList();
       });
     } catch (e) {
-      // Handle error, for example by showing a dialog
+      print(e);
     }
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  // Đây là hàm sẽ được gọi khi bạn quay về màn HomeScreen hoặc chuyển tab sang Home
+  @override
+  void didPopNext() {
+    _loadSongs();
+  }
+
+  @override
+  void didPush() {
+    _loadSongs();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(
+          'Musik',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
         elevation: 0,
       ),
@@ -78,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       id: song['id'],
                       url: '$baseUrl/get_music_file/${song['id']}',
                       name: song['user_name'] ?? 'Unknown Name',
-                      avatar: '$baseUrl/get_avatar/${song['user_id']}',
+                      avatar: _authService.generateAvatarUrl(song['user_id']),
                       user_id: song['user_id'],
                       description: song['description'] ?? 'No Description',
                       currentPlayingId: _currentPlayingId,

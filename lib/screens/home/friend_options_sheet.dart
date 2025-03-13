@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
+import 'package:musik/screens/(common)/personal_info_screen.dart';
 import 'package:musik/widgets/success_popup.dart';
 
 class FriendOptionsSheet extends StatefulWidget {
@@ -12,7 +12,11 @@ class FriendOptionsSheet extends StatefulWidget {
   final String avatarUrl;
   final int profileUserId;
 
-  FriendOptionsSheet({required this.name, required this.avatarUrl, required this.profileUserId});
+  FriendOptionsSheet({
+    required this.name,
+    required this.avatarUrl,
+    required this.profileUserId,
+  });
 
   @override
   _FriendOptionsSheetState createState() => _FriendOptionsSheetState();
@@ -38,7 +42,10 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/get_user_profile/${widget.profileUserId}'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/get_user_profile/${widget.profileUserId}'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -105,7 +112,10 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
       Navigator.pop(context);
       SuccessPopup(message: 'Xóa bạn thành công', outerContext: context).show();
     } else {
-      SuccessPopup(message: 'Không thể xóa nhạc', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Không thể xóa nhạc',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -123,9 +133,15 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
 
     if (response.statusCode == 201) {
       _getProfileInfo();
-      SuccessPopup(message: 'Gửi lời mời kết bạn thành công', outerContext: context).show();
+      SuccessPopup(
+        message: 'Gửi lời mời kết bạn thành công',
+        outerContext: context,
+      ).show();
     } else {
-      SuccessPopup(message: 'Gửi lời mời kết bạn thất bại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Gửi lời mời kết bạn thất bại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -133,20 +149,38 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-      decoration: BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(20)), color: Colors.white),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: Colors.white,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircleAvatar(radius: 40, backgroundImage: NetworkImage(widget.avatarUrl)),
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: NetworkImage(widget.avatarUrl),
+          ),
           SizedBox(height: 12),
-          Text(widget.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal)),
+          Text(
+            widget.name,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.teal,
+            ),
+          ),
           SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               if (!isOwnProfile) ...[
                 if (!isFriend && !isFriendRequest)
-                  IconButton(onPressed: _sendFriendRequest, icon: Icon(Icons.person_add, color: Colors.teal), tooltip: 'Add Friend', iconSize: 36),
+                  IconButton(
+                    onPressed: _sendFriendRequest,
+                    icon: Icon(Icons.person_add, color: Colors.teal),
+                    tooltip: 'Add Friend',
+                    iconSize: 36,
+                  ),
                 if (!isFriend && isFriendRequest) ...[
                   if (friendRequestDirection == "sent")
                     IconButton(
@@ -156,12 +190,27 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                       iconSize: 36,
                     ),
                   if (friendRequestDirection == "received") ...[
-                    IconButton(onPressed: _acceptFriendRequest, icon: Icon(Icons.check, color: Colors.teal), tooltip: 'Accept Request', iconSize: 36),
-                    IconButton(onPressed: _cancelFriendRequest, icon: Icon(Icons.close, color: Colors.red), tooltip: 'Decline Request', iconSize: 36),
+                    IconButton(
+                      onPressed: _acceptFriendRequest,
+                      icon: Icon(Icons.check, color: Colors.teal),
+                      tooltip: 'Accept Request',
+                      iconSize: 36,
+                    ),
+                    IconButton(
+                      onPressed: _cancelFriendRequest,
+                      icon: Icon(Icons.close, color: Colors.red),
+                      tooltip: 'Decline Request',
+                      iconSize: 36,
+                    ),
                   ],
                 ],
                 if (isFriend)
-                  IconButton(onPressed: _removeFriend, icon: Icon(Icons.person_remove, color: Colors.teal), tooltip: 'Remove Friend', iconSize: 36),
+                  IconButton(
+                    onPressed: _removeFriend,
+                    icon: Icon(Icons.person_remove, color: Colors.teal),
+                    tooltip: 'Remove Friend',
+                    iconSize: 36,
+                  ),
                 if (isFriend)
                   IconButton(
                     onPressed: () {
@@ -175,8 +224,17 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
               ],
               IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  // Implement View Profile logic
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => PersonalInfoScreen(
+                            name: widget.name,
+                            avatarUrl: widget.avatarUrl,
+                            profileUserId: widget.profileUserId,
+                          ),
+                    ),
+                  );
                 },
                 icon: Icon(Icons.account_circle, color: Colors.teal),
                 tooltip: 'View Profile',

@@ -1,81 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:musik/services/music_service.dart';
+import 'package:musik/controllers/audio_controller.dart';
+import 'package:musik/screens/library/album_saved/album_selection_dialog.dart';
 import 'package:musik/screens/home/friend_options_sheet.dart';
-import 'package:musik/common/config.dart';
-import 'package:musik/widgets/success_popup.dart';
 
-class AlbumMusicPlayer extends StatefulWidget {
+class MusicPlayer extends StatefulWidget {
   final int id;
-  final int albumId;
-  final String avatar;
   final String url;
-  final int user_id;
+  final String avatar;
+  final int? albumId;
   final String name;
+  final int user_id;
   final String description;
   final int currentPlayingId;
   final Function(int id) setPlayingId;
-  final Function(int id) onMusicRemoved;
+  final bool isLiked;
+  final bool inAlbum;
+  final VoidCallback onToggleLike;
 
-  AlbumMusicPlayer({
+  MusicPlayer({
     required this.id,
-    required this.albumId,
-    required this.user_id,
-    required this.avatar,
     required this.url,
+    required this.avatar,
+    required this.albumId,
     required this.name,
+    required this.user_id,
     required this.description,
     required this.currentPlayingId,
     required this.setPlayingId,
-    required this.onMusicRemoved,
+    required this.isLiked,
+    required this.inAlbum,
+    required this.onToggleLike,
   });
 
   @override
-  _AlbumMusicPlayerState createState() => _AlbumMusicPlayerState();
+  _MusicPlayerState createState() => _MusicPlayerState();
 }
 
-class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  final storage = FlutterSecureStorage();
+class _MusicPlayerState extends State<MusicPlayer> {
+  final AudioController _audioController = AudioController();
+  final MusicService _musicService = MusicService();
   bool isPlaying = false;
+  late bool _inAlbum;
 
   @override
   void initState() {
     super.initState();
+    _inAlbum = widget.inAlbum;
     _setupAudio();
-    _audioPlayer.playbackEventStream.listen((event) {
-      if (event.processingState == ProcessingState.completed) {
-        _handlePlaybackComplete();
-      }
-    });
   }
 
   void _setupAudio() async {
     try {
-      await _audioPlayer.setUrl(widget.url);
+      await _audioController.setUrl(widget.url);
     } catch (e) {
-      print("Error setting URL album music player: $e");
+      print("Error setting URL: $e");
     }
   }
 
-  void _handlePlaybackComplete() {
-    setState(() {
-      isPlaying = false;
-    });
-    widget.setPlayingId(-1);
-    _audioPlayer.setUrl('');
-  }
-
   @override
-  void didUpdateWidget(AlbumMusicPlayer oldWidget) {
+  void didUpdateWidget(MusicPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.currentPlayingId != widget.id) {
       setState(() {
         isPlaying = false;
       });
-      _audioPlayer.pause();
+      _audioController.pause();
     }
   }
 
@@ -85,10 +76,11 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
       setState(() {
         isPlaying = false;
       });
-      _audioPlayer.pause();
+      _audioController.pause();
     } else {
-      if (_audioPlayer.processingState == ProcessingState.completed) {
-        await _audioPlayer.seek(Duration.zero);
+      if (_audioController.audioPlayer.processingState ==
+          ProcessingState.completed) {
+        await _audioController.seek(Duration.zero);
       }
       setState(() {
         isPlaying = true;
@@ -97,55 +89,24 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
         _setupAudio();
       }
       widget.setPlayingId(widget.id);
-      _audioPlayer.play();
+      _audioController.play();
     }
   }
 
-  Future<void> _removeMusic() async {
-    final token = await storage.read(key: 'authToken');
-    if (token == null) {
-      return;
+  Future<void> _removeFromAlbum() async {
+    try {
+      await _musicService.removeFromAlbum(widget.albumId ?? -1, widget.id);
+      setState(() {
+        _inAlbum = false;
+      });
+    } catch (e) {
+      // Handle error
     }
-
-    final url = Uri.parse('$baseUrl/remove_music_from_album');
-    final response = await http.delete(
-      url,
-      headers: {'Content-Type': 'application/json', 'Authorization': token},
-      body: jsonEncode({'album_id': widget.albumId, 'music_id': widget.id}),
-    );
-
-    if (response.statusCode == 200) {
-      SuccessPopup(
-        message: 'Xóa nhạc thành công',
-        outerContext: context,
-      ).show();
-      widget.onMusicRemoved(widget.id);
-    } else {
-      SuccessPopup(
-        message: 'Không thể xóa nhạc',
-        outerContext: context,
-      ).show(success: false);
-    }
-  }
-
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder:
-          (context) => FriendOptionsSheet(
-            name: widget.name,
-            avatarUrl: widget.avatar,
-            profileUserId: widget.user_id,
-          ),
-    );
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _audioController.dispose();
     super.dispose();
   }
 
@@ -159,28 +120,11 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: () => _showBottomSheet(context),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(widget.avatar),
-              ),
-            ),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => _showBottomSheet(context),
-                    child: Text(
-                      widget.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
                   Text(
                     widget.description,
                     style: TextStyle(color: Colors.black54),
@@ -198,7 +142,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
-                        stream: _audioPlayer.positionStream,
+                        stream: _audioController.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
                           return Text(
@@ -209,11 +153,11 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
                       ),
                       Expanded(
                         child: StreamBuilder<Duration?>(
-                          stream: _audioPlayer.durationStream,
+                          stream: _audioController.durationStream,
                           builder: (context, snapshot) {
                             final duration = snapshot.data ?? Duration.zero;
                             return StreamBuilder<Duration>(
-                              stream: _audioPlayer.positionStream,
+                              stream: _audioController.positionStream,
                               builder: (context, snapshot) {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
@@ -223,7 +167,7 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
                                           ? duration.inMilliseconds.toDouble()
                                           : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(
+                                    await _audioController.seek(
                                       Duration(milliseconds: value.toInt()),
                                     );
                                   },
@@ -243,9 +187,30 @@ class _AlbumMusicPlayerState extends State<AlbumMusicPlayer> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(Icons.share, color: Colors.teal),
                 IconButton(
-                  icon: Icon(Icons.bookmark, color: Colors.teal),
-                  onPressed: _removeMusic,
+                  icon: Icon(
+                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.teal,
+                  ),
+                  onPressed: widget.onToggleLike,
+                ),
+                IconButton(
+                  icon: Icon(
+                    _inAlbum ? Icons.bookmark : Icons.bookmark_border,
+                    color: Colors.teal,
+                  ),
+                  onPressed: () {
+                    if (_inAlbum) {
+                      _removeFromAlbum();
+                    } else {
+                      showAlbumSelectionDialog(context, widget.id, () {
+                        setState(() {
+                          _inAlbum = true;
+                        });
+                      });
+                    }
+                  },
                 ),
               ],
             ),

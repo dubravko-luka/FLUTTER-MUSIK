@@ -33,7 +33,10 @@ class AuthService {
   }
 
   Future<bool> fetchAndStoreUserInfo(String token) async {
-    final response = await http.get(Uri.parse('$baseUrl/user_info'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_info'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final userInfo = jsonDecode(response.body);
@@ -77,7 +80,11 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginScreen()), (Route<dynamic> route) => false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 
   Future<void> handleInvalidToken(BuildContext context) async {
@@ -89,7 +96,13 @@ class AuthService {
 
   void _navigateToLogin(BuildContext context) {
     Future.microtask(() {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
     });
+  }
+
+  String generateAvatarUrl(int userId) {
+    return '$baseUrl/get_avatar/$userId?${DateTime.now().millisecondsSinceEpoch}';
   }
 }

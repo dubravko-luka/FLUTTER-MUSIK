@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:musik/common/config.dart';
+import 'package:musik/services/auth_service.dart';
 import 'my_music_player.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -13,6 +14,7 @@ class MyMusicScreen extends StatefulWidget {
 class _MyMusicScreenState extends State<MyMusicScreen> {
   List<dynamic> _songs = [];
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   bool _isLoading = true;
   int _currentPlayingId = -1;
 
@@ -33,7 +35,10 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/my_music'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/my_music'),
+      headers: {'Authorization': token},
+    );
     if (response.statusCode == 200) {
       setState(() {
         _songs = jsonDecode(response.body);
@@ -51,7 +56,10 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nhạc của tôi', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          'Nhạc của tôi',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
       ),
@@ -67,7 +75,9 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
                     final name = song['name'] ?? 'Unknown Name';
                     final description = song['description'] ?? 'No Description';
                     final url = '$baseUrl/get_music_file/${song['id']}';
-                    final avatar = '$baseUrl/get_avatar/${song['user_id']}';
+                    final avatar = _authService.generateAvatarUrl(
+                      song['user_id'],
+                    );
 
                     return MyMusicPlayer(
                       id: song['id'],

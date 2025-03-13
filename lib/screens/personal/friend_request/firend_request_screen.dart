@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:musik/common/config.dart';
+import 'package:musik/services/auth_service.dart';
 import 'package:musik/widgets/friend_options_sheet.dart';
 import 'package:musik/widgets/success_popup.dart';
 
@@ -13,6 +14,7 @@ class FriendRequestsScreen extends StatefulWidget {
 
 class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   List<Map<String, dynamic>> friendRequests = [];
   bool isLoading = true;
 
@@ -28,7 +30,10 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/list_friend_requests'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/list_friend_requests'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -65,12 +70,20 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
 
     if (response.statusCode == 201) {
       setState(() {
-        friendRequests.removeWhere((request) => request['request_id'] == requestId);
+        friendRequests.removeWhere(
+          (request) => request['request_id'] == requestId,
+        );
       });
-      SuccessPopup(message: 'Chấp nhận thành công', outerContext: context).show();
+      SuccessPopup(
+        message: 'Chấp nhận thành công',
+        outerContext: context,
+      ).show();
     } else {
       _fetchFriendRequests();
-      SuccessPopup(message: 'Chấp nhận thất bại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Chấp nhận thất bại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -88,22 +101,34 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
 
     if (response.statusCode == 200) {
       setState(() {
-        friendRequests.removeWhere((request) => request['request_id'] == requestId);
+        friendRequests.removeWhere(
+          (request) => request['request_id'] == requestId,
+        );
       });
       SuccessPopup(message: 'Từ chối thành công', outerContext: context).show();
     } else {
       _fetchFriendRequests();
-      SuccessPopup(message: 'Từ chối thất bại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Từ chối thất bại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
   void _showBottomSheet(BuildContext context, request) {
-    final avatar = '$baseUrl/get_avatar/${request['requester_id']}';
+    final avatar = _authService.generateAvatarUrl(request['requester_id']);
 
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => FriendOptionsSheet(name: request['requester_name'], avatarUrl: avatar, profileUserId: request['requester_id']),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => FriendOptionsSheet(
+            name: request['requester_name'],
+            avatarUrl: avatar,
+            profileUserId: request['requester_id'],
+          ),
     );
   }
 
@@ -139,14 +164,26 @@ class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
                     final request = friendRequests[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       elevation: 5,
                       child: ListTile(
                         leading: GestureDetector(
                           onTap: () => _showBottomSheet(context, request),
-                          child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${request['requester_id']}')),
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(
+                              _authService.generateAvatarUrl(
+                                request['requester_id'],
+                              ),
+                            ),
+                          ),
                         ),
-                        title: Text(request['requester_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(
+                          request['requester_name'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(request['requester_email']),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,

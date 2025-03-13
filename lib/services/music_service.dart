@@ -15,11 +15,22 @@ class MusicService {
       throw Exception('Missing token');
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/list_music'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/list_music'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> songs = jsonDecode(response.body);
-      return songs.map((song) => {...song, 'liked': song['liked'] == 1, 'in_album': song['in_album'] == 1}).toList();
+      return songs
+          .map(
+            (song) => {
+              ...song,
+              'liked': song['liked'] == 1,
+              'in_album': song['in_album'] == 1,
+            },
+          )
+          .toList();
     } else {
       _authService.handleInvalidToken(context);
       return [];
@@ -33,7 +44,10 @@ class MusicService {
     }
 
     final endpoint = isLiked ? '/unlike_music/$songId' : '/like_music/$songId';
-    final response = await http.post(Uri.parse('$baseUrl$endpoint'), headers: {'Authorization': token});
+    final response = await http.post(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {'Authorization': token},
+    );
 
     if (!(response.statusCode == 200 || response.statusCode == 201)) {
       throw Exception('Failed to toggle like');
@@ -55,6 +69,37 @@ class MusicService {
 
     if (response.statusCode != 200) {
       throw Exception("Failed to remove from album");
+    }
+  }
+
+  Future<List<dynamic>> fetchSongsByUser(
+    BuildContext context,
+    int userId,
+  ) async {
+    final token = await storage.read(key: 'authToken');
+    if (token == null) {
+      throw Exception("Missing token");
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_music/$userId'),
+      headers: {'Authorization': token},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> songs = jsonDecode(response.body);
+      return songs
+          .map(
+            (song) => {
+              ...song,
+              'liked': song['liked'] == 1,
+              'in_album': song['in_album'] == 1,
+            },
+          )
+          .toList();
+    } else {
+      _authService.handleInvalidToken(context);
+      return [];
     }
   }
 }

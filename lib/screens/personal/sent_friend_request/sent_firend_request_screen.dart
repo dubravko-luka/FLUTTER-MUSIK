@@ -4,16 +4,19 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:musik/common/config.dart';
+import 'package:musik/services/auth_service.dart';
 import 'package:musik/widgets/friend_options_sheet.dart';
 import 'package:musik/widgets/success_popup.dart';
 
 class SentFriendRequestsScreen extends StatefulWidget {
   @override
-  _SentFriendRequestsScreenState createState() => _SentFriendRequestsScreenState();
+  _SentFriendRequestsScreenState createState() =>
+      _SentFriendRequestsScreenState();
 }
 
 class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   List<Map<String, dynamic>> sentRequests = [];
   bool isLoading = true;
 
@@ -24,12 +27,19 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
   }
 
   void _showBottomSheet(BuildContext context, request) {
-    final avatar = '$baseUrl/get_avatar/${request['recipient_id']}';
+    final avatar = _authService.generateAvatarUrl(request['recipient_id']);
 
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => FriendOptionsSheet(name: request['recipient_name'], avatarUrl: avatar, profileUserId: request['recipient_id']),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => FriendOptionsSheet(
+            name: request['recipient_name'],
+            avatarUrl: avatar,
+            profileUserId: request['recipient_id'],
+          ),
     );
   }
 
@@ -79,11 +89,19 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
 
     if (response.statusCode == 200) {
       setState(() {
-        sentRequests.removeWhere((request) => request['request_id'] == requestId);
+        sentRequests.removeWhere(
+          (request) => request['request_id'] == requestId,
+        );
       });
-      SuccessPopup(message: 'Hủy lời mời kết bạn thành công', outerContext: context).show();
+      SuccessPopup(
+        message: 'Hủy lời mời kết bạn thành công',
+        outerContext: context,
+      ).show();
     } else {
-      SuccessPopup(message: 'Vui lòng thử lại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Vui lòng thử lại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -119,14 +137,26 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
                     final request = sentRequests[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       elevation: 5,
                       child: ListTile(
                         leading: GestureDetector(
                           onTap: () => _showBottomSheet(context, request),
-                          child: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${request['recipient_id']}')),
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(
+                              _authService.generateAvatarUrl(
+                                request['recipient_id'],
+                              ),
+                            ),
+                          ),
                         ),
-                        title: Text(request['recipient_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                        title: Text(
+                          request['recipient_name'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(request['recipient_email']),
                         trailing: IconButton(
                           icon: Icon(Icons.cancel, color: Colors.red),

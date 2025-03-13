@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:musik/common/config.dart';
+import 'package:musik/services/auth_service.dart';
 import 'dart:convert';
 
 import 'liked_music_player.dart';
@@ -13,6 +14,7 @@ class MyLikedScreen extends StatefulWidget {
 
 class _MyLikedScreenState extends State<MyLikedScreen> {
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   List<dynamic> _songs = [];
   bool _isLoading = true;
   int _currentPlayingId = -1;
@@ -35,7 +37,10 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/liked_music'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/liked_music'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       setState(() {
@@ -57,7 +62,10 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       return;
     }
 
-    final response = await http.post(Uri.parse('$baseUrl/unlike_music/$songId'), headers: {'Authorization': token});
+    final response = await http.post(
+      Uri.parse('$baseUrl/unlike_music/$songId'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       setState(() {
@@ -72,7 +80,10 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bài hát yêu thích', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          'Bài hát yêu thích',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
       ),
@@ -89,13 +100,16 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
                     final description = song['description'] ?? 'No Description';
                     // Since this is the liked screen, we assume everything is liked.
                     final url = '$baseUrl/get_music_file/${song['id']}';
-                    final avatar = '$baseUrl/get_avatar/${song['user_id']}';
+                    final avatar = _authService.generateAvatarUrl(
+                      song['user_id'],
+                    );
 
                     return LikedMusicPlayer(
                       id: song['id'],
                       url: url,
                       name: name,
                       avatar: avatar,
+                      user_id: song['user_id'],
                       description: description,
                       currentPlayingId: _currentPlayingId,
                       setPlayingId: (int songId) {

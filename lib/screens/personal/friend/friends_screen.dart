@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:musik/common/config.dart';
+import 'package:musik/services/auth_service.dart';
 import 'dart:convert';
 import 'friend_options_sheet.dart';
 
@@ -12,6 +13,7 @@ class FriendsScreen extends StatefulWidget {
 
 class _FriendsScreenState extends State<FriendsScreen> {
   final storage = FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   List<Map<String, dynamic>> friends = [];
   bool isLoading = true;
 
@@ -27,12 +29,24 @@ class _FriendsScreenState extends State<FriendsScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/list_friends'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/list_friends'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       setState(() {
-        friends = data.map((friend) => {'id': friend['id'], 'name': friend['name'], 'email': friend['email']}).toList();
+        friends =
+            data
+                .map(
+                  (friend) => {
+                    'id': friend['id'],
+                    'name': friend['name'],
+                    'email': friend['email'],
+                  },
+                )
+                .toList();
         isLoading = false;
       });
     } else {
@@ -40,14 +54,19 @@ class _FriendsScreenState extends State<FriendsScreen> {
     }
   }
 
-  void _showOptionsBottomSheet(BuildContext context, Map<String, dynamic> friend) {
+  void _showOptionsBottomSheet(
+    BuildContext context,
+    Map<String, dynamic> friend,
+  ) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
         return FriendOptionsSheet(
           name: friend['name'],
-          avatarUrl: '$baseUrl/get_avatar/${friend['id']}',
+          avatarUrl: _authService.generateAvatarUrl(friend['id']),
           profileUserId: friend['id'],
           onFriendRemoved: _fetchFriends, // Pass the callback
         );
@@ -87,11 +106,21 @@ class _FriendsScreenState extends State<FriendsScreen> {
                     final friend = friends[index];
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       elevation: 5,
                       child: ListTile(
-                        leading: CircleAvatar(radius: 30, backgroundImage: NetworkImage('$baseUrl/get_avatar/${friend['id']}')),
-                        title: Text(friend['name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(
+                            _authService.generateAvatarUrl(friend['id']),
+                          ),
+                        ),
+                        title: Text(
+                          friend['name'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Text(friend['email']),
                         trailing: IconButton(
                           icon: Icon(Icons.more_vert, color: Colors.teal),
