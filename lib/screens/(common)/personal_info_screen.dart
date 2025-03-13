@@ -37,7 +37,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('$baseUrl/user_info'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('$baseUrl/user_info'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -69,19 +72,31 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       var request =
           http.MultipartRequest('POST', Uri.parse('$baseUrl/upload_avatar'))
             ..headers['Authorization'] = token
-            ..files.add(http.MultipartFile.fromBytes('avatar', fileBytes, filename: fileName));
+            ..files.add(
+              http.MultipartFile.fromBytes(
+                'avatar',
+                fileBytes,
+                filename: fileName,
+              ),
+            );
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 201) {
-        SuccessPopup(message: 'Cập nhật avatar thành công', outerContext: context).show();
+        SuccessPopup(
+          message: 'Cập nhật avatar thành công',
+          outerContext: context,
+        ).show();
         setState(() {
           _avatarUrl = generateAvatarUrl(_userId!); // Use _userId here
         });
         _authService.fetchAndStoreUserInfo(token);
       } else {
-        SuccessPopup(message: 'Cập nhật avatar thất bại', outerContext: context).show(success: false);
+        SuccessPopup(
+          message: 'Cập nhật avatar thất bại',
+          outerContext: context,
+        ).show(success: false);
       }
     } catch (e) {
       return;
@@ -101,10 +116,16 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
 
     if (response.statusCode == 200) {
-      SuccessPopup(message: 'Cập nhật thành công', outerContext: context).show();
+      SuccessPopup(
+        message: 'Cập nhật thành công',
+        outerContext: context,
+      ).show();
       _fetchUserInfo();
     } else {
-      SuccessPopup(message: 'Cập nhật thất bại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Cập nhật thất bại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -114,12 +135,20 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             backgroundColor: Colors.tealAccent.shade100,
             title: Text('Edit Name'),
-            content: TextField(controller: controller, decoration: InputDecoration(hintText: 'Enter your name')),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(hintText: 'Enter your name'),
+            ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -144,7 +173,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         title: Text('Thông tin cá nhân'),
         backgroundColor: Colors.tealAccent.shade100,
         foregroundColor: Colors.black,
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body:
           _isLoading
@@ -172,8 +204,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                   CircleAvatar(
                                     radius: 60,
                                     backgroundColor: Colors.tealAccent.shade100,
-                                    backgroundImage: _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
-                                    child: _avatarUrl == null ? Icon(Icons.person, size: 60, color: Colors.teal.shade600) : null,
+                                    backgroundImage:
+                                        _avatarUrl != null
+                                            ? NetworkImage(_avatarUrl!)
+                                            : null,
+                                    child:
+                                        _avatarUrl == null
+                                            ? Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.teal.shade600,
+                                            )
+                                            : null,
                                   ),
                                   Positioned(
                                     right: 0,
@@ -182,7 +224,10 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                       onPressed: _uploadAvatar,
                                       mini: true,
                                       backgroundColor: Colors.teal,
-                                      child: Icon(Icons.edit, color: Colors.white),
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -190,15 +235,23 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                             ),
                             SizedBox(height: 30),
                             Card(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
                               elevation: 5,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
                                   children: [
-                                    _buildEditableInfoRow('Name:', _name ?? 'Loading...'),
+                                    _buildEditableInfoRow(
+                                      'Name:',
+                                      _name ?? 'Loading...',
+                                    ),
                                     Divider(),
-                                    _buildInfoRow('Email:', _email ?? 'Loading...'),
+                                    _buildInfoRow(
+                                      'Email:',
+                                      _email ?? 'Loading...',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -217,11 +270,24 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.teal)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.teal,
+          ),
+        ),
         Row(
           children: [
-            Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-            IconButton(icon: Icon(Icons.edit, color: Colors.teal), onPressed: _showEditNameDialog),
+            Text(
+              value,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ),
+            IconButton(
+              icon: Icon(Icons.edit, color: Colors.teal),
+              onPressed: _showEditNameDialog,
+            ),
           ],
         ),
       ],
@@ -232,8 +298,18 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.teal)),
-        Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.teal,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
       ],
     );
   }

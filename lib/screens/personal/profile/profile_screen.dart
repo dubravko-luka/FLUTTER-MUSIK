@@ -6,7 +6,7 @@ import 'package:musik/screens/personal/sent_friend_request/sent_firend_request_s
 import 'package:musik/screens/personal/setting/settings.dart';
 import 'package:musik/screens/personal/friend/friends_screen.dart';
 import 'package:musik/screens/personal/person_info/personal_info_screen.dart';
-import 'package:musik/screens/personal/upload_music/upload_music_screen.dart';
+import 'package:musik/screens/personal/upload_music/upload_music_web_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -41,7 +41,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [..._buildMenuItems(context)]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [..._buildMenuItems(context)],
+            ),
           ),
         ),
       ),
@@ -51,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   List<Widget> _buildMenuItems(BuildContext context) {
     final menuItems = [
       {'title': 'Thông tin cá nhân', 'screen': PersonalInfoScreen()},
-      {'title': 'Tải nhạc lên', 'screen': UploadMusicScreen()},
+      {'title': 'Tải nhạc lên', 'screen': UploadMusicWebScreen()},
       {'title': 'Bạn bè', 'screen': FriendsScreen()},
       {'title': 'Lời mời kết bạn', 'screen': FriendRequestsScreen()},
       {'title': 'Lời mời đã gửi', 'screen': SentFriendRequestsScreen()},
@@ -60,21 +63,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
 
     return menuItems.map((item) {
-      return _buildMenuItem(item['title'] as String, context, item['screen'] as Widget);
+      return _buildMenuItem(
+        item['title'] as String,
+        context,
+        item['screen'] as Widget,
+      );
     }).toList();
   }
 
   Widget _buildMenuItem(String title, BuildContext context, Widget screen) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 3,
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: ListTile(
-          title: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          title: Text(
+            title,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
           trailing: Icon(Icons.arrow_forward_ios, color: Colors.teal),
         ),
       ),
