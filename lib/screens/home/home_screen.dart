@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:musik/common/config.dart';
-import 'package:musik/screens/music_player/music_player.dart';
+import 'package:musik/widgets/music_player/music_player.dart';
 import 'package:musik/services/auth_service.dart';
+import 'package:musik/services/favourite.dart';
 import 'package:musik/services/music_service.dart';
-import 'package:flutter/widgets.dart';
 
 final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 
@@ -12,10 +12,10 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-// Kế thừa từ RouteAware
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   final MusicService _musicService = MusicService();
   final AuthService _authService = AuthService();
+  final FavouriteService _favouriteService = FavouriteService();
   List<dynamic> _songs = [];
   bool _isLoading = true;
   int _currentPlayingId = -1;
@@ -28,39 +28,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Future<void> _loadSongs() async {
     try {
-      if (!mounted) return; // Check if widget is still mounted
+      if (!mounted) return;
       setState(() {
         _isLoading = true;
       });
       final songs = await _musicService.fetchSongs(context);
-      if (!mounted) return; // Re-check after async operation
+      if (!mounted) return;
       setState(() {
         _songs = songs;
         _isLoading = false;
       });
     } catch (e) {
-      if (!mounted) return; // Re-check after async operation
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-    }
-  }
-
-  Future<void> _handleToggleLike(int songId, bool isLiked) async {
-    try {
-      await _musicService.toggleLike(songId, isLiked);
-      if (!mounted) return; // Ensure widget is mounted before calling setState
-      setState(() {
-        _songs =
-            _songs.map((song) {
-              if (song['id'] == songId) {
-                song['liked'] = !isLiked;
-              }
-              return song;
-            }).toList();
-      });
-    } catch (e) {
-      print(e);
     }
   }
 
@@ -76,7 +58,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.dispose();
   }
 
-  // Đây là hàm sẽ được gọi khi bạn quay về màn HomeScreen hoặc chuyển tab sang Home
   @override
   void didPopNext() {
     _loadSongs();
@@ -121,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       isLiked: song['liked'] ?? false,
                       inAlbum: song['in_album'] ?? false,
                       onToggleLike: () {
-                        _handleToggleLike(song['id'], song['liked']);
+                        _favouriteService.handleToggleLike(song['id'], song['liked'], _songs, setState, mounted);
                       },
                     );
                   },

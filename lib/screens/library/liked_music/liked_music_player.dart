@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:musik/screens/home/friend_options_sheet.dart';
+import 'package:musik/widgets/bottom-sheet/friend_options_sheet.dart';
 import 'package:just_audio/just_audio.dart';
 
 class LikedMusicPlayer extends StatefulWidget {
@@ -104,15 +104,8 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder:
-          (context) => FriendOptionsSheet(
-            name: widget.name,
-            avatarUrl: widget.avatar,
-            profileUserId: widget.user_id,
-          ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => FriendOptionsSheet(name: widget.name, avatarUrl: widget.avatar, profileUserId: widget.user_id),
     );
   }
 
@@ -126,13 +119,7 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: () => _showBottomSheet(context),
-              child: CircleAvatar(
-                radius: 30,
-                backgroundImage: NetworkImage(widget.avatar),
-              ),
-            ),
+            GestureDetector(onTap: () => _showBottomSheet(context), child: CircleAvatar(radius: 30, backgroundImage: NetworkImage(widget.avatar))),
             SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -140,38 +127,21 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
                 children: [
                   GestureDetector(
                     onTap: () => _showBottomSheet(context),
-                    child: Text(
-                      widget.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
-                  Text(
-                    widget.description,
-                    style: TextStyle(color: Colors.black54),
-                  ),
+                  Text(widget.description, style: TextStyle(color: Colors.black54)),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          color: Colors.teal,
-                        ),
+                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioPlayer.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(
-                            position.toString().split('.').first,
-                            style: TextStyle(color: Colors.black54),
-                          );
+                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
                         },
                       ),
                       Expanded(
@@ -185,14 +155,9 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max:
-                                      duration.inMilliseconds.toDouble() > 0
-                                          ? duration.inMilliseconds.toDouble()
-                                          : 1.0,
+                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(
-                                      Duration(milliseconds: value.toInt()),
-                                    );
+                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
                                   },
                                   activeColor: Colors.teal,
                                   inactiveColor: Colors.teal.shade100,
@@ -210,13 +175,7 @@ class _LikedMusicPlayerState extends State<LikedMusicPlayer> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                  icon: Icon(
-                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.teal,
-                  ),
-                  onPressed: widget.onToggleLike,
-                ),
+                IconButton(icon: Icon(widget.isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.teal), onPressed: widget.onToggleLike),
               ],
             ),
           ],
