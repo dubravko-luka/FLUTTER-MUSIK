@@ -28,15 +28,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Future<void> _loadSongs() async {
     try {
+      if (!mounted) return; // Check if widget is still mounted
       setState(() {
         _isLoading = true;
       });
       final songs = await _musicService.fetchSongs(context);
+      if (!mounted) return; // Re-check after async operation
       setState(() {
         _songs = songs;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return; // Re-check after async operation
       setState(() {
         _isLoading = false;
       });
@@ -46,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Future<void> _handleToggleLike(int songId, bool isLiked) async {
     try {
       await _musicService.toggleLike(songId, isLiked);
+      if (!mounted) return; // Ensure widget is mounted before calling setState
       setState(() {
         _songs =
             _songs.map((song) {
@@ -87,10 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Musik',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.teal,
         elevation: 0,
       ),

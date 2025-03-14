@@ -123,16 +123,19 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   }
 
   Future<bool> _onWillPop() async {
+    if (_file == null) {
+      return true; // Allow the screen to close without confirmation if no file is selected
+    }
     final result = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: Colors.tealAccent.shade100,
-          title: Text('Confirm', style: TextStyle(color: Colors.teal)),
-          content: Text('Do you really want to exit?', style: TextStyle(color: Colors.black87)),
+          title: Text('Xác nhận', style: TextStyle(color: Colors.teal)),
+          content: Text('Bạn có chắc chắn muốn thoát không?', style: TextStyle(color: Colors.black87)),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Cancel', style: TextStyle(color: Colors.teal))),
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Hủy', style: TextStyle(color: Colors.teal))),
             TextButton(onPressed: () => Navigator.of(context).pop(true), child: Text('OK', style: TextStyle(color: Colors.teal))),
           ],
         );
@@ -183,7 +186,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                       SizedBox(height: 20),
                       TextField(
                         decoration: InputDecoration(
-                          labelText: 'Select Music File',
+                          labelText: 'Chọn tệp nhạc',
                           prefixIcon: Icon(Icons.upload_file),
                           suffixIcon: _file != null ? Icon(Icons.check, color: Colors.green) : null,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -198,7 +201,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                       TextField(
                         controller: _descriptionController,
                         decoration: InputDecoration(
-                          labelText: 'Describe your mood',
+                          labelText: 'Mô tả tâm trạng của bạn',
                           prefixIcon: Icon(Icons.edit),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
