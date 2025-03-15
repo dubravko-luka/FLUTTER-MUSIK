@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:musik/common/config.dart';
 import 'package:musik/screens/(common)/messaging_screen.dart';
+import 'package:musik/screens/(common)/personal_info_screen.dart';
 import 'package:musik/widgets/success_popup.dart';
 
 class FriendOptionsSheet extends StatefulWidget {
@@ -152,8 +153,17 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
               ],
               IconButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  // Implement View Profile logic
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => PersonalInfoScreen(
+                            name: widget.name,
+                            avatarUrl: widget.avatarUrl,
+                            profileUserId: widget.profileUserId,
+                          ),
+                    ),
+                  );
                 },
                 icon: Icon(Icons.account_circle, color: Colors.teal),
                 tooltip: 'View Profile',
