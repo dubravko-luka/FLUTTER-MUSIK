@@ -48,24 +48,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     final menuItems = [
-      {'title': 'Thông tin cá nhân', 'screen': PersonalInfoScreen(), 'icon': Icons.person},
-      {'title': 'Tải nhạc lên', 'screen': UploadMusicScreen(), 'icon': Icons.cloud_upload},
+      {
+        'title': 'Thông tin cá nhân',
+        'screen': PersonalInfoScreen(),
+        'icon': Icons.person,
+      },
+      {
+        'title': 'Tải nhạc lên',
+        'screen': UploadMusicScreen(),
+        'icon': Icons.cloud_upload,
+      },
       {'title': 'Bạn bè', 'screen': FriendsScreen(), 'icon': Icons.people},
-      {'title': 'Lời mời kết bạn', 'screen': FriendRequestsScreen(), 'icon': Icons.person_add},
-      {'title': 'Lời mời đã gửi', 'screen': SentFriendRequestsScreen(), 'icon': Icons.send},
-      {'title': 'Trợ giúp & hỗ trợ', 'screen': HelpSupportScreen(), 'icon': Icons.help},
+      {
+        'title': 'Lời mời kết bạn',
+        'screen': FriendRequestsScreen(),
+        'icon': Icons.person_add,
+      },
+      {
+        'title': 'Lời mời đã gửi',
+        'screen': SentFriendRequestsScreen(),
+        'icon': Icons.send,
+      },
+      {
+        'title': 'Trợ giúp & hỗ trợ',
+        'screen': HelpSupportScreen(),
+        'icon': Icons.help,
+      },
       {'title': 'Cài đặt', 'screen': SettingsScreen(), 'icon': Icons.settings},
     ];
 
     return menuItems.map((item) {
-      return _buildMenuItem(item['title'] as String, context, item['screen'] as Widget, item['icon'] as IconData);
+      return _buildMenuItem(
+        item['title'] as String,
+        context,
+        item['screen'] as Widget,
+        item['icon'] as IconData,
+      );
     }).toList();
   }
 
-  Widget _buildMenuItem(String title, BuildContext context, Widget screen, IconData icon) {
+  Widget _buildMenuItem(
+    String title,
+    BuildContext context,
+    Widget screen,
+    IconData icon,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -77,7 +110,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Icon(icon, size: 48, color: Colors.teal),
               SizedBox(height: 8),
-              Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),

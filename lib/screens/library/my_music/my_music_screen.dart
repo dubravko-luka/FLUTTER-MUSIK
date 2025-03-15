@@ -66,36 +66,46 @@ class _MyMusicScreenState extends State<MyMusicScreen> {
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: _songs.length,
-                  itemBuilder: (context, index) {
-                    final song = _songs[index];
-                    final name = song['name'] ?? 'Unknown Name';
-                    final description = song['description'] ?? 'No Description';
-                    final url = '$baseUrl/get_music_file/${song['id']}';
-                    final avatar = _authService.generateAvatarUrl(
-                      song['user_id'],
-                    );
+              : Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: _songs.length,
+                    itemBuilder: (context, index) {
+                      final song = _songs[index];
+                      final name = song['name'] ?? 'Unknown Name';
+                      final description =
+                          song['description'] ?? 'No Description';
+                      final url = '$baseUrl/get_music_file/${song['id']}';
+                      final avatar = _authService.generateAvatarUrl(
+                        song['user_id'],
+                      );
 
-                    return MyMusicPlayer(
-                      id: song['id'],
-                      url: url,
-                      avatar: avatar,
-                      name: name,
-                      description: description,
-                      currentPlayingId: _currentPlayingId,
-                      setPlayingId: (int songId) {
-                        setState(() {
-                          _currentPlayingId = songId;
-                        });
-                      },
-                      onDelete: () {
-                        _fetchSongs();
-                      },
-                    );
-                  },
+                      return MyMusicPlayer(
+                        id: song['id'],
+                        url: url,
+                        avatar: avatar,
+                        name: name,
+                        description: description,
+                        currentPlayingId: _currentPlayingId,
+                        setPlayingId: (int songId) {
+                          setState(() {
+                            _currentPlayingId = songId;
+                          });
+                        },
+                        onDelete: () {
+                          _fetchSongs();
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
     );

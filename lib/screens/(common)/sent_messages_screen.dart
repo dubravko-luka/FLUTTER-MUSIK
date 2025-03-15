@@ -30,7 +30,10 @@ class _SentMessagesScreenState extends State<SentMessagesScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('${baseUrl}/sent_messages'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('${baseUrl}/sent_messages'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       setState(() {
@@ -49,7 +52,11 @@ class _SentMessagesScreenState extends State<SentMessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Messages'), backgroundColor: Colors.teal, centerTitle: true, elevation: 1),
+      appBar: AppBar(
+        title: Text('Tin nhắn', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.tealAccent.shade100,
+        foregroundColor: Colors.black,
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -65,7 +72,11 @@ class _SentMessagesScreenState extends State<SentMessagesScreen> {
                   itemCount: _sentMessages.length,
                   itemBuilder: (context, index) {
                     final message = _sentMessages[index];
-                    final avatar = _authService.generateAvatarUrl(message['is_me'] ? message['recipient_id'] : message['sender_id']);
+                    final avatar = _authService.generateAvatarUrl(
+                      message['is_me']
+                          ? message['recipient_id']
+                          : message['sender_id'],
+                    );
 
                     return GestureDetector(
                       onTap: () {
@@ -74,8 +85,14 @@ class _SentMessagesScreenState extends State<SentMessagesScreen> {
                           MaterialPageRoute(
                             builder:
                                 (context) => MessagingScreen(
-                                  recipientId: message['is_me'] ? message['recipient_id'] : message['sender_id'],
-                                  connectId: message['is_me'] ? message['sender_id'] : message['recipient_id'],
+                                  recipientId:
+                                      message['is_me']
+                                          ? message['recipient_id']
+                                          : message['sender_id'],
+                                  connectId:
+                                      message['is_me']
+                                          ? message['sender_id']
+                                          : message['recipient_id'],
                                   recipientName: message['name'],
                                 ),
                           ),
@@ -85,20 +102,34 @@ class _SentMessagesScreenState extends State<SentMessagesScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: Card(
                           margin: EdgeInsets.symmetric(vertical: 2.0),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           elevation: 5,
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Row(
                               children: [
-                                GestureDetector(child: CircleAvatar(radius: 30, backgroundImage: NetworkImage(avatar))),
+                                GestureDetector(
+                                  child: CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: NetworkImage(avatar),
+                                  ),
+                                ),
                                 SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       GestureDetector(
-                                        child: Text(message['name'] ?? 'Unknown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                        child: Text(
+                                          message['name'] ?? 'Unknown',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),

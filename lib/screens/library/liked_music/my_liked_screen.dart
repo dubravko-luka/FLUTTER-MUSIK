@@ -90,39 +90,49 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: _songs.length,
-                  itemBuilder: (context, index) {
-                    final song = _songs[index];
-                    final name = song['user_name'] ?? 'Unknown Name';
-                    final description = song['description'] ?? 'No Description';
-                    // Since this is the liked screen, we assume everything is liked.
-                    final url = '$baseUrl/get_music_file/${song['id']}';
-                    final avatar = _authService.generateAvatarUrl(
-                      song['user_id'],
-                    );
+              : Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: _songs.length,
+                    itemBuilder: (context, index) {
+                      final song = _songs[index];
+                      final name = song['user_name'] ?? 'Unknown Name';
+                      final description =
+                          song['description'] ?? 'No Description';
+                      // Since this is the liked screen, we assume everything is liked.
+                      final url = '$baseUrl/get_music_file/${song['id']}';
+                      final avatar = _authService.generateAvatarUrl(
+                        song['user_id'],
+                      );
 
-                    return LikedMusicPlayer(
-                      id: song['id'],
-                      url: url,
-                      name: name,
-                      avatar: avatar,
-                      user_id: song['user_id'],
-                      description: description,
-                      currentPlayingId: _currentPlayingId,
-                      setPlayingId: (int songId) {
-                        setState(() {
-                          _currentPlayingId = songId;
-                        });
-                      },
-                      isLiked: true, // All songs in this list are liked
-                      onToggleLike: () {
-                        _unlikeSong(song['id']);
-                      },
-                    );
-                  },
+                      return LikedMusicPlayer(
+                        id: song['id'],
+                        url: url,
+                        name: name,
+                        avatar: avatar,
+                        user_id: song['user_id'],
+                        description: description,
+                        currentPlayingId: _currentPlayingId,
+                        setPlayingId: (int songId) {
+                          setState(() {
+                            _currentPlayingId = songId;
+                          });
+                        },
+                        isLiked: true, // All songs in this list are liked
+                        onToggleLike: () {
+                          _unlikeSong(song['id']);
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
     );

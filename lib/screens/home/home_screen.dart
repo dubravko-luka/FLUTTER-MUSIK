@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:musik/common/config.dart';
+import 'package:musik/screens/(common)/search_screen.dart';
 import 'package:musik/widgets/music_player/music_player.dart';
 import 'package:musik/services/auth_service.dart';
 import 'package:musik/services/favourite.dart';
@@ -72,9 +73,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Musik', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(
+          'Musik',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
         elevation: 0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body:
           _isLoading
@@ -102,7 +117,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       isLiked: song['liked'] ?? false,
                       inAlbum: song['in_album'] ?? false,
                       onToggleLike: () {
-                        _favouriteService.handleToggleLike(song['id'], song['liked'], _songs, setState, mounted);
+                        _favouriteService.handleToggleLike(
+                          song['id'],
+                          song['liked'],
+                          _songs,
+                          setState,
+                          mounted,
+                        );
                       },
                     );
                   },
