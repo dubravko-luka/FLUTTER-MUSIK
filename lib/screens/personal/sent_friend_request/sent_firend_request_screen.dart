@@ -109,8 +109,11 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lời mời kết bạn đã gửi'),
-        backgroundColor: Colors.tealAccent.shade100,
+        title: Text(
+          'Lời mời kết bạn đã gửi',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -121,10 +124,11 @@ class _SentFriendRequestsScreenState extends State<SentFriendRequestsScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child:

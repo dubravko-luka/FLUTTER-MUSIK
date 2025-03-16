@@ -114,7 +114,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.teal,
+              color: Colors.orange,
             ),
           ),
           SizedBox(height: 24),
@@ -125,7 +125,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                 if (isFriend)
                   IconButton(
                     onPressed: _removeFriend,
-                    icon: Icon(Icons.person_remove, color: Colors.teal),
+                    icon: Icon(Icons.person_remove, color: Colors.red),
                     tooltip: 'Remove Friend',
                     iconSize: 36,
                   ),
@@ -146,7 +146,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                       ),
                     );
                   },
-                  icon: Icon(Icons.message, color: Colors.teal),
+                  icon: Icon(Icons.message, color: Colors.orange),
                   tooltip: 'Send Message',
                   iconSize: 36,
                 ),
@@ -165,7 +165,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                     ),
                   );
                 },
-                icon: Icon(Icons.account_circle, color: Colors.teal),
+                icon: Icon(Icons.account_circle, color: Colors.orange),
                 tooltip: 'View Profile',
                 iconSize: 36,
               ),

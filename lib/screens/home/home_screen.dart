@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:musik/common/config.dart';
 import 'package:musik/screens/(common)/search_screen.dart';
+import 'package:musik/screens/(common)/sent_messages_screen.dart';
 import 'package:musik/widgets/music_player/music_player.dart';
 import 'package:musik/services/auth_service.dart';
 import 'package:musik/services/favourite.dart';
@@ -72,63 +73,102 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Musik',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SearchScreen()),
-              );
-            },
+      body: Stack(
+        children: <Widget>[
+          // Background Image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  'assets/background.png',
+                ), // Path to your background image
+                fit: BoxFit.cover, // Cover the whole screen
+              ),
+            ),
+          ),
+          // Main Body Content
+          Column(
+            children: [
+              AppBar(
+                title: Text(
+                  'Musik',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                backgroundColor: Colors.orange,
+                elevation: 0,
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.search),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchScreen()),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.message),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SentMessagesScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child:
+                    _isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListView.builder(
+                            itemCount: _songs.length,
+                            itemBuilder: (context, index) {
+                              final song = _songs[index];
+                              return MusicPlayer(
+                                id: song['id'],
+                                url: '$baseUrl/get_music_file/${song['id']}',
+                                name: song['user_name'] ?? 'Unknown Name',
+                                avatar: _authService.generateAvatarUrl(
+                                  song['user_id'],
+                                ),
+                                user_id: song['user_id'],
+                                description:
+                                    song['description'] ?? 'No Description',
+                                currentPlayingId: _currentPlayingId,
+                                setPlayingId: (int songId) {
+                                  setState(() {
+                                    _currentPlayingId = songId;
+                                  });
+                                },
+                                albumId: song['album_id'],
+                                isLiked: song['liked'] ?? false,
+                                inAlbum: song['in_album'] ?? false,
+                                onToggleLike: () {
+                                  _favouriteService.handleToggleLike(
+                                    song['id'],
+                                    song['liked'],
+                                    _songs,
+                                    setState,
+                                    mounted,
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+              ),
+            ],
           ),
         ],
       ),
-      body:
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: _songs.length,
-                  itemBuilder: (context, index) {
-                    final song = _songs[index];
-                    return MusicPlayer(
-                      id: song['id'],
-                      url: '$baseUrl/get_music_file/${song['id']}',
-                      name: song['user_name'] ?? 'Unknown Name',
-                      avatar: _authService.generateAvatarUrl(song['user_id']),
-                      user_id: song['user_id'],
-                      description: song['description'] ?? 'No Description',
-                      currentPlayingId: _currentPlayingId,
-                      setPlayingId: (int songId) {
-                        setState(() {
-                          _currentPlayingId = songId;
-                        });
-                      },
-                      albumId: song['album_id'],
-                      isLiked: song['liked'] ?? false,
-                      inAlbum: song['in_album'] ?? false,
-                      onToggleLike: () {
-                        _favouriteService.handleToggleLike(
-                          song['id'],
-                          song['liked'],
-                          _songs,
-                          setState,
-                          mounted,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
     );
   }
 }

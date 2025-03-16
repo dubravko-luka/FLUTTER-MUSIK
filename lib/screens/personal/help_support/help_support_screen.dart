@@ -5,8 +5,11 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trợ giúp và hỗ trợ'),
-        backgroundColor: Colors.tealAccent.shade100,
+        title: Text(
+          'Trợ giúp và hỗ trợ',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -17,10 +20,11 @@ class HelpSupportScreen extends StatelessWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: Padding(
@@ -73,7 +77,7 @@ class HelpSupportScreen extends StatelessWidget {
                   label: Text('Liên hệ ngay'),
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Colors.orange,
                     textStyle: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -90,7 +94,7 @@ class HelpSupportScreen extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
-        leading: Icon(icon, color: Colors.teal),
+        leading: Icon(icon, color: Colors.orange),
         title: Text(
           title,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
@@ -106,7 +110,7 @@ class HelpSupportScreen extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
-        leading: Icon(icon, color: Colors.teal),
+        leading: Icon(icon, color: Colors.orange),
         title: Text(info, style: TextStyle(fontSize: 18)),
         onTap: onTap,
       ),

@@ -6,7 +6,11 @@ import 'package:musik/screens/personal/sent_friend_request/sent_firend_request_s
 import 'package:musik/screens/personal/setting/settings.dart';
 import 'package:musik/screens/personal/friend/friends_screen.dart';
 import 'package:musik/screens/personal/person_info/personal_info_screen.dart';
-import 'package:musik/screens/personal/upload_music/upload_music_screen.dart';
+import 'package:musik/screens/personal/upload_music/upload_music_web_screen.dart';
+import 'package:musik/screens/(common)/sent_messages_screen.dart';
+import 'package:musik/screens/library/album_saved/album_screen.dart';
+import 'package:musik/screens/library/liked_music/my_liked_screen.dart';
+import 'package:musik/screens/library/my_music/my_music_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -26,36 +30,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade500],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GridView.count(
-            crossAxisCount: 2, // 2 items per row
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1, // square tiles
-            children: _buildMenuItems(context),
+          padding: const EdgeInsets.all(8.0), // Reduced padding
+          child: Column(
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: _buildMenuItem(
+                        'Thông tin cá nhân',
+                        context,
+                        PersonalInfoScreen(),
+                        Icons.person,
+                        fullWidth: true,
+                      ),
+                    ),
+                    SliverToBoxAdapter(child: SizedBox(height: 30)),
+                    SliverGrid.count(
+                      crossAxisCount: 2, // 2 items per row
+                      crossAxisSpacing: 2, // Spacing b etween items
+                      mainAxisSpacing: 2, // Spacing between items
+                      childAspectRatio: 3, // Wider aspect ratio
+                      children: [..._buildMenuItemsFriends(context)],
+                    ),
+                    SliverToBoxAdapter(child: SizedBox(height: 30)),
+                    SliverGrid.count(
+                      crossAxisCount: 2, // 2 items per row
+                      crossAxisSpacing: 2, // Spacing b etween items
+                      mainAxisSpacing: 2, // Spacing between items
+                      childAspectRatio: 3, // Wider aspect ratio
+                      children: [..._buildMenuItemsAlbum(context)],
+                    ),
+                    SliverToBoxAdapter(child: SizedBox(height: 30)),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        _buildMenuItemsSettings(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildMenuItems(BuildContext context) {
+  List<Widget> _buildMenuItemsFriends(BuildContext context) {
     final menuItems = [
       {
-        'title': 'Thông tin cá nhân',
-        'screen': PersonalInfoScreen(),
-        'icon': Icons.person,
-      },
-      {
         'title': 'Tải nhạc lên',
-        'screen': UploadMusicScreen(),
+        'screen': UploadMusicWebScreen(),
         'icon': Icons.cloud_upload,
       },
       {'title': 'Bạn bè', 'screen': FriendsScreen(), 'icon': Icons.people},
@@ -69,6 +103,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'screen': SentFriendRequestsScreen(),
         'icon': Icons.send,
       },
+    ];
+
+    return menuItems.map((item) {
+      return _buildMenuItem(
+        item['title'] as String,
+        context,
+        item['screen'] as Widget,
+        item['icon'] as IconData,
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildMenuItemsSettings(BuildContext context) {
+    final menuItems = [
       {
         'title': 'Trợ giúp & hỗ trợ',
         'screen': HelpSupportScreen(),
@@ -87,12 +135,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }).toList();
   }
 
+  List<Widget> _buildMenuItemsAlbum(BuildContext context) {
+    final menuItems = [
+      {
+        'title': 'Nhạc của tôi',
+        'screen': MyMusicScreen(),
+        'icon': Icons.library_music,
+      },
+      {
+        'title': 'Nhạc yêu thích',
+        'screen': MyLikedScreen(),
+        'icon': Icons.favorite,
+      },
+      {'title': 'Album đã lưu', 'screen': AlbumScreen(), 'icon': Icons.album},
+      {
+        'title': 'Tin nhắn',
+        'screen': SentMessagesScreen(),
+        'icon': Icons.message_outlined,
+      },
+    ];
+
+    return menuItems.map((item) {
+      return _buildMenuItem(
+        item['title'] as String,
+        context,
+        item['screen'] as Widget,
+        item['icon'] as IconData,
+      );
+    }).toList();
+  }
+
   Widget _buildMenuItem(
     String title,
     BuildContext context,
     Widget screen,
-    IconData icon,
-  ) {
+    IconData icon, {
+    bool fullWidth = false,
+  }) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -102,18 +181,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 5,
+        elevation: 2, // Adjust elevation
         child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          height: 80, // Set fixed height for each card
+          width: fullWidth ? double.infinity : null,
+          padding: EdgeInsets.symmetric(
+            vertical: 8,
+            horizontal: 20,
+          ), // Reduced padding inside the card
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(icon, size: 48, color: Colors.teal),
-              SizedBox(height: 8),
+              Icon(icon, size: 36, color: Colors.orange), // Adjusted icon size
+              SizedBox(width: 15), // Reduced height between icon and text
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ), // Font size
               ),
             ],
           ),

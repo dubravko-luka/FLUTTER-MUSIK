@@ -84,7 +84,7 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
           'Bài hát yêu thích',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.tealAccent.shade100,
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
       ),
       body:
@@ -92,10 +92,11 @@ class _MyLikedScreenState extends State<MyLikedScreen> {
               ? Center(child: CircularProgressIndicator())
               : Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/background.png',
+                    ), // Path to your background image
+                    fit: BoxFit.cover, // Cover the whole screen
                   ),
                 ),
                 child: Padding(

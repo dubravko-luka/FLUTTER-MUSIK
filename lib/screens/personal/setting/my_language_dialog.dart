@@ -6,8 +6,8 @@ void showLanguageDialog(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: Colors.tealAccent.shade100,
-        title: Text('Select Language', style: TextStyle(color: Colors.teal)),
+        backgroundColor: Colors.orangeAccent.shade100,
+        title: Text('Select Language', style: TextStyle(color: Colors.orange)),
         content: Container(
           width: double.minPositive,
           child: ListView(
@@ -36,7 +36,7 @@ void showLanguageDialog(BuildContext context) {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel', style: TextStyle(color: Colors.teal)),
+            child: Text('Cancel', style: TextStyle(color: Colors.orange)),
           ),
         ],
       );

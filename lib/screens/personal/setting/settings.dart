@@ -18,8 +18,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cài đặt'),
-        backgroundColor: Colors.tealAccent.shade100,
+        title: Text('Cài đặt', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -30,10 +30,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: ListView(
@@ -104,11 +105,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showPrivacySettings(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+    );
   }
 
   void _showAboutApp(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppScreen()));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AboutAppScreen()),
+    );
   }
 
   Widget _buildSettingTile(
@@ -124,8 +131,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       elevation: 5,
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
-        leading: Icon(icon, color: Colors.teal),
-        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+        leading: Icon(icon, color: Colors.orange),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
         subtitle: subtitle != null ? Text(subtitle) : null,
         trailing: trailing,
         onTap: onTap,

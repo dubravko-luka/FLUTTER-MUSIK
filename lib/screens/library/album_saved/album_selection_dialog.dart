@@ -5,14 +5,21 @@ import 'dart:convert';
 import 'package:musik/common/config.dart';
 import 'package:musik/widgets/success_popup.dart';
 
-void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback onAddedToAlbum) async {
+void showAlbumSelectionDialog(
+  BuildContext context,
+  int musicId,
+  VoidCallback onAddedToAlbum,
+) async {
   final storage = FlutterSecureStorage();
   final token = await storage.read(key: 'authToken');
   if (token == null) {
     return;
   }
 
-  final response = await http.get(Uri.parse('$baseUrl/list_albums'), headers: {'Authorization': token});
+  final response = await http.get(
+    Uri.parse('$baseUrl/list_albums'),
+    headers: {'Authorization': token},
+  );
 
   if (response.statusCode == 200) {
     final List<dynamic> albums = jsonDecode(response.body);
@@ -20,9 +27,11 @@ void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback on
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          backgroundColor: Colors.tealAccent.shade100,
-          title: Text('Select Album', style: TextStyle(color: Colors.teal)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: Colors.white,
+          title: Text('Chọn album', style: TextStyle(color: Colors.orange)),
           content: Container(
             width: double.minPositive,
             child: ListView.builder(
@@ -30,23 +39,41 @@ void showAlbumSelectionDialog(BuildContext context, int musicId, VoidCallback on
               itemCount: albums.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(albums[index]['name'], style: TextStyle(color: Colors.black87)),
+                  title: Text(
+                    albums[index]['name'],
+                    style: TextStyle(color: Colors.black87),
+                  ),
                   onTap: () {
                     Navigator.of(context).pop();
-                    addMusicToAlbum(context, albums[index]['id'], musicId, onAddedToAlbum);
+                    addMusicToAlbum(
+                      context,
+                      albums[index]['id'],
+                      musicId,
+                      onAddedToAlbum,
+                    );
                   },
                 );
               },
             ),
           ),
-          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel', style: TextStyle(color: Colors.teal)))],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Từ chối', style: TextStyle(color: Colors.orange)),
+            ),
+          ],
         );
       },
     );
   }
 }
 
-Future<void> addMusicToAlbum(BuildContext context, int albumId, int musicId, VoidCallback onAddedToAlbum) async {
+Future<void> addMusicToAlbum(
+  BuildContext context,
+  int albumId,
+  int musicId,
+  VoidCallback onAddedToAlbum,
+) async {
   final storage = FlutterSecureStorage();
   final token = await storage.read(key: 'authToken');
   if (token == null) {

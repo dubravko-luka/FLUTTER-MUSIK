@@ -68,13 +68,19 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
       return;
     }
 
-    final response = await http.delete(Uri.parse('$baseUrl/delete_music/${widget.id}'), headers: {'Authorization': token});
+    final response = await http.delete(
+      Uri.parse('$baseUrl/delete_music/${widget.id}'),
+      headers: {'Authorization': token},
+    );
 
     if (response.statusCode == 200) {
       widget.onDelete();
       SuccessPopup(message: 'Xóa thành công', outerContext: context).show();
     } else {
-      SuccessPopup(message: 'Xóa thất bại', outerContext: context).show(success: false);
+      SuccessPopup(
+        message: 'Xóa thất bại',
+        outerContext: context,
+      ).show(success: false);
     }
   }
 
@@ -127,26 +133,43 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
         padding: const EdgeInsets.all(12.0),
         child: Row(
           children: [
-            CircleAvatar(radius: 30, backgroundImage: NetworkImage(widget.avatar)),
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(widget.avatar),
+            ),
             SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(widget.description, style: TextStyle(color: Colors.black54)),
+                  Text(
+                    widget.name,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(
+                    widget.description,
+                    style: TextStyle(color: Colors.black54),
+                  ),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
+                        icon: Icon(
+                          isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          color: Colors.orange,
+                        ),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioPlayer.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
+                          return Text(
+                            position.toString().split('.').first,
+                            style: TextStyle(color: Colors.black54),
+                          );
                         },
                       ),
                       Expanded(
@@ -160,12 +183,17 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
+                                  max:
+                                      duration.inMilliseconds.toDouble() > 0
+                                          ? duration.inMilliseconds.toDouble()
+                                          : 1.0,
                                   onChanged: (value) async {
-                                    await _audioPlayer.seek(Duration(milliseconds: value.toInt()));
+                                    await _audioPlayer.seek(
+                                      Duration(milliseconds: value.toInt()),
+                                    );
                                   },
-                                  activeColor: Colors.teal,
-                                  inactiveColor: Colors.teal.shade100,
+                                  activeColor: Colors.orange,
+                                  inactiveColor: Colors.orange.shade100,
                                 );
                               },
                             );
@@ -181,7 +209,7 @@ class _MyMusicPlayerState extends State<MyMusicPlayer> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.delete, color: Colors.teal),
+                  icon: Icon(Icons.delete, color: Colors.orange),
                   onPressed: _deleteMusic, // Call delete function
                 ),
               ],

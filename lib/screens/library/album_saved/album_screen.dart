@@ -63,7 +63,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
           'Album đã lưu',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.tealAccent.shade100,
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
       ),
       body:
@@ -71,10 +71,11 @@ class _AlbumScreenState extends State<AlbumScreen> {
               ? Center(child: CircularProgressIndicator())
               : Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/background.png',
+                    ), // Path to your background image
+                    fit: BoxFit.cover, // Cover the whole screen
                   ),
                 ),
                 child: Padding(
@@ -93,14 +94,14 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 ),
               ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showCreateAlbumDialog,
-        backgroundColor: Colors.teal,
+        onPressed: _showCreaorangebumDialog,
+        backgroundColor: Colors.orange,
         child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  void _showCreateAlbumDialog() {
+  void _showCreaorangebumDialog() {
     TextEditingController albumNameController = TextEditingController();
 
     showDialog(
@@ -108,20 +109,23 @@ class _AlbumScreenState extends State<AlbumScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          backgroundColor: Colors.tealAccent.shade100,
-          title: Text('Create New Album', style: TextStyle(color: Colors.teal)),
+          backgroundColor: Colors.white,
+          title: Text('Tạo album mới', style: TextStyle(color: Colors.orange)),
           content: TextField(
             controller: albumNameController,
             decoration: InputDecoration(
-              hintText: 'Enter album name',
+              hintText: 'Nhập tên album',
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
+                borderSide: BorderSide(color: Colors.orange),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
+                borderSide: BorderSide(color: Colors.orange),
               ),
+
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
           actions: <Widget>[
@@ -129,16 +133,16 @@ class _AlbumScreenState extends State<AlbumScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel', style: TextStyle(color: Colors.teal)),
+              child: Text('Từ chối', style: TextStyle(color: Colors.orange)),
             ),
             ElevatedButton(
               onPressed: () async {
                 String albumName = albumNameController.text;
-                _createAlbum(albumName);
+                _creaorangebum(albumName);
                 Navigator.of(context).pop();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-              child: Text('Confirm', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+              child: Text('Đồng ý', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -146,7 +150,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
     );
   }
 
-  Future<void> _createAlbum(String albumName) async {
+  Future<void> _creaorangebum(String albumName) async {
     final token = await storage.read(key: 'authToken');
     if (token == null) {
       return;
@@ -183,20 +187,25 @@ class _AlbumScreenState extends State<AlbumScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          backgroundColor: Colors.tealAccent.shade100,
-          title: Text('Edit Album Name', style: TextStyle(color: Colors.teal)),
+          backgroundColor: Colors.white,
+          title: Text(
+            'Chỉnh sửa tên album',
+            style: TextStyle(color: Colors.orange),
+          ),
           content: TextField(
             controller: albumNameController,
             decoration: InputDecoration(
-              hintText: 'Enter new album name',
+              hintText: 'Nhập tên album',
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
+                borderSide: BorderSide(color: Colors.orange),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.teal),
+                borderSide: BorderSide(color: Colors.orange),
               ),
+              filled: true,
+              fillColor: Colors.white,
             ),
           ),
           actions: <Widget>[
@@ -204,7 +213,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel', style: TextStyle(color: Colors.teal)),
+              child: Text('Cancel', style: TextStyle(color: Colors.orange)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -212,7 +221,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
                 _editAlbumName(albumId, newName);
                 Navigator.of(context).pop();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
               child: Text('Save', style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -258,7 +267,9 @@ class _AlbumScreenState extends State<AlbumScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AlbumMusicScreen(albumId: album['id']),
+            builder:
+                (context) =>
+                    AlbumMusicScreen(albumId: album['id'], name: album['name']),
           ),
         ).then((_) => _fetchAlbums());
       },
@@ -299,7 +310,7 @@ class _AlbumScreenState extends State<AlbumScreen> {
               top: 8,
               right: 8,
               child: IconButton(
-                icon: Icon(Icons.edit, color: Colors.teal),
+                icon: Icon(Icons.edit, color: Colors.orange),
                 onPressed: () {
                   _showEditAlbumDialog(album['id'], album['name']);
                 },

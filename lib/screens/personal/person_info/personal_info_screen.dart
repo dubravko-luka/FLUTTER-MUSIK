@@ -143,24 +143,37 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            backgroundColor: Colors.tealAccent.shade100,
-            title: Text('Edit Name'),
+            backgroundColor: Colors.white,
+            title: Text('Sửa tên', style: TextStyle(color: Colors.orange)),
             content: TextField(
               controller: controller,
-              decoration: InputDecoration(hintText: 'Enter your name'),
+              decoration: InputDecoration(
+                hintText: 'Nhập tên của bạn',
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.orange),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.orange),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Cancel'),
+                child: Text('Từ chối', style: TextStyle(color: Colors.orange)),
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                   String newName = controller.text.trim();
                   if (newName.isNotEmpty) _updateName(newName);
                 },
-                child: Text('Save'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                child: Text('Đồng ý', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -171,8 +184,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thông tin cá nhân'),
-        backgroundColor: Colors.tealAccent.shade100,
+        title: Text(
+          'Thông tin cá nhân',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -184,10 +200,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               ? Center(child: CircularProgressIndicator())
               : Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/background.png',
+                    ), // Path to your background image
+                    fit: BoxFit.cover, // Cover the whole screen
                   ),
                 ),
                 child: Padding(
@@ -204,7 +221,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                 children: [
                                   CircleAvatar(
                                     radius: 60,
-                                    backgroundColor: Colors.tealAccent.shade100,
+                                    backgroundColor:
+                                        Colors.orangeAccent.shade100,
                                     backgroundImage:
                                         _avatarUrl != null
                                             ? NetworkImage(_avatarUrl!)
@@ -214,7 +232,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                             ? Icon(
                                               Icons.person,
                                               size: 60,
-                                              color: Colors.teal.shade600,
+                                              color: Colors.orange.shade600,
                                             )
                                             : null,
                                   ),
@@ -224,7 +242,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                                     child: FloatingActionButton(
                                       onPressed: _uploadAvatar,
                                       mini: true,
-                                      backgroundColor: Colors.teal,
+                                      backgroundColor: Colors.orange,
                                       child: Icon(
                                         Icons.edit,
                                         color: Colors.white,
@@ -276,7 +294,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
-            color: Colors.teal,
+            color: Colors.orange,
           ),
         ),
         Row(
@@ -286,7 +304,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
             ),
             IconButton(
-              icon: Icon(Icons.edit, color: Colors.teal),
+              icon: Icon(Icons.edit, color: Colors.orange),
               onPressed: _showEditNameDialog,
             ),
           ],
@@ -304,7 +322,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
-            color: Colors.teal,
+            color: Colors.orange,
           ),
         ),
         Text(

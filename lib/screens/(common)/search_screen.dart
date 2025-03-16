@@ -104,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.tealAccent.shade100,
+        backgroundColor: Colors.orange,
         foregroundColor: Colors.black,
         title: TextField(
           controller: _searchController,
@@ -137,10 +137,11 @@ class _SearchScreenState extends State<SearchScreen>
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: Padding(
@@ -246,7 +247,7 @@ class _SearchScreenState extends State<SearchScreen>
             ),
             subtitle: Text(friend['email']),
             trailing: IconButton(
-              icon: Icon(Icons.more_vert, color: Colors.teal),
+              icon: Icon(Icons.more_vert, color: Colors.orange),
               onPressed: () {
                 _showBottomSheet(context, friend);
               },

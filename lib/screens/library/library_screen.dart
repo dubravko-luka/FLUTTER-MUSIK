@@ -10,19 +10,20 @@ class LibraryScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: GridView.count(
             crossAxisCount: 2, // 2 items per row
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1, // square tiles
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 2, // square tiles
             children: _buildMenuItems(context),
           ),
         ),
@@ -32,33 +33,63 @@ class LibraryScreen extends StatelessWidget {
 
   List<Widget> _buildMenuItems(BuildContext context) {
     final menuItems = [
-      {'title': 'Nhạc của tôi', 'screen': MyMusicScreen(), 'icon': Icons.library_music},
-      {'title': 'Nhạc yêu thích', 'screen': MyLikedScreen(), 'icon': Icons.favorite},
+      {
+        'title': 'Nhạc của tôi',
+        'screen': MyMusicScreen(),
+        'icon': Icons.library_music,
+      },
+      {
+        'title': 'Nhạc yêu thích',
+        'screen': MyLikedScreen(),
+        'icon': Icons.favorite,
+      },
       {'title': 'Album đã lưu', 'screen': AlbumScreen(), 'icon': Icons.album},
-      {'title': 'Tin nhắn', 'screen': SentMessagesScreen(), 'icon': Icons.message_outlined},
+      {
+        'title': 'Tin nhắn',
+        'screen': SentMessagesScreen(),
+        'icon': Icons.message_outlined,
+      },
     ];
 
     return menuItems.map((item) {
-      return _buildMenuItem(item['title'] as String, context, item['screen'] as Widget, item['icon'] as IconData);
+      return _buildMenuItem(
+        item['title'] as String,
+        context,
+        item['screen'] as Widget,
+        item['icon'] as IconData,
+      );
     }).toList();
   }
 
-  Widget _buildMenuItem(String title, BuildContext context, Widget screen, IconData icon) {
+  Widget _buildMenuItem(
+    String title,
+    BuildContext context,
+    Widget screen,
+    IconData icon,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 5,
+        elevation: 2,
         child: Container(
-          padding: EdgeInsets.all(16),
+          height: 80, // Set
+          padding: EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 48, color: Colors.teal),
-              SizedBox(height: 8),
-              Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              Icon(icon, size: 36, color: Colors.orange),
+              SizedBox(height: 4),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),

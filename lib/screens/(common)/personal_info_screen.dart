@@ -75,8 +75,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.name),
-        backgroundColor: Colors.tealAccent.shade100,
+        title: Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.orangeAccent.shade100,
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -85,10 +85,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.tealAccent.shade100, Colors.teal.shade700],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/background.png',
+            ), // Path to your background image
+            fit: BoxFit.cover, // Cover the whole screen
           ),
         ),
         child: Padding(
@@ -106,7 +107,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                         ? Icon(
                           Icons.person,
                           size: 60,
-                          color: Colors.teal.shade600,
+                          color: Colors.orange.shade600,
                         )
                         : null,
               ),
@@ -174,7 +175,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w500,
-            color: Colors.teal,
+            color: Colors.orange,
           ),
         ),
         Text(

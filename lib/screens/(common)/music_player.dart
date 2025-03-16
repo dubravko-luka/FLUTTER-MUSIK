@@ -77,7 +77,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
       });
       _audioController.pause();
     } else {
-      if (_audioController.audioPlayer.processingState == ProcessingState.completed) {
+      if (_audioController.audioPlayer.processingState ==
+          ProcessingState.completed) {
         await _audioController.seek(Duration.zero);
       }
       setState(() {
@@ -123,19 +124,30 @@ class _MusicPlayerState extends State<MusicPlayer> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.description, style: TextStyle(color: Colors.black54)),
+                  Text(
+                    widget.description,
+                    style: TextStyle(color: Colors.black54),
+                  ),
                   SizedBox(height: 8),
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.teal),
+                        icon: Icon(
+                          isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          color: Colors.orange,
+                        ),
                         onPressed: _togglePlayPause,
                       ),
                       StreamBuilder<Duration>(
                         stream: _audioController.positionStream,
                         builder: (context, snapshot) {
                           final position = snapshot.data ?? Duration.zero;
-                          return Text(position.toString().split('.').first, style: TextStyle(color: Colors.black54));
+                          return Text(
+                            position.toString().split('.').first,
+                            style: TextStyle(color: Colors.black54),
+                          );
                         },
                       ),
                       Expanded(
@@ -149,12 +161,17 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                 final position = snapshot.data ?? Duration.zero;
                                 return Slider(
                                   value: position.inMilliseconds.toDouble(),
-                                  max: duration.inMilliseconds.toDouble() > 0 ? duration.inMilliseconds.toDouble() : 1.0,
+                                  max:
+                                      duration.inMilliseconds.toDouble() > 0
+                                          ? duration.inMilliseconds.toDouble()
+                                          : 1.0,
                                   onChanged: (value) async {
-                                    await _audioController.seek(Duration(milliseconds: value.toInt()));
+                                    await _audioController.seek(
+                                      Duration(milliseconds: value.toInt()),
+                                    );
                                   },
-                                  activeColor: Colors.teal,
-                                  inactiveColor: Colors.teal.shade100,
+                                  activeColor: Colors.orange,
+                                  inactiveColor: Colors.orange.shade100,
                                 );
                               },
                             );
@@ -169,10 +186,19 @@ class _MusicPlayerState extends State<MusicPlayer> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.share, color: Colors.teal),
-                IconButton(icon: Icon(widget.isLiked ? Icons.favorite : Icons.favorite_border, color: Colors.teal), onPressed: widget.onToggleLike),
+                Icon(Icons.share, color: Colors.orange),
                 IconButton(
-                  icon: Icon(_inAlbum ? Icons.bookmark : Icons.bookmark_border, color: Colors.teal),
+                  icon: Icon(
+                    widget.isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.orange,
+                  ),
+                  onPressed: widget.onToggleLike,
+                ),
+                IconButton(
+                  icon: Icon(
+                    _inAlbum ? Icons.bookmark : Icons.bookmark_border,
+                    color: Colors.orange,
+                  ),
                   onPressed: () {
                     if (_inAlbum) {
                       _removeFromAlbum();

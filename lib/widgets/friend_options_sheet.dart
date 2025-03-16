@@ -79,7 +79,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.teal,
+              color: Colors.orange,
             ),
           ),
           SizedBox(height: 24),
@@ -100,7 +100,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                     ),
                   );
                 },
-                icon: Icon(Icons.account_circle, color: Colors.teal),
+                icon: Icon(Icons.account_circle, color: Colors.orange),
                 tooltip: 'View Profile',
                 iconSize: 36,
               ),

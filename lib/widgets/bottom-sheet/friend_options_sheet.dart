@@ -173,7 +173,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.teal,
+              color: Colors.orange,
             ),
           ),
           SizedBox(height: 24),
@@ -184,7 +184,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                 if (!isFriend && !isFriendRequest)
                   IconButton(
                     onPressed: _sendFriendRequest,
-                    icon: Icon(Icons.person_add, color: Colors.teal),
+                    icon: Icon(Icons.person_add, color: Colors.orange),
                     tooltip: 'Add Friend',
                     iconSize: 36,
                   ),
@@ -192,14 +192,14 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                   if (friendRequestDirection == "sent")
                     IconButton(
                       onPressed: _cancelFriendRequest,
-                      icon: Icon(Icons.cancel, color: Colors.teal),
+                      icon: Icon(Icons.cancel, color: Colors.orange),
                       tooltip: 'Cancel Request',
                       iconSize: 36,
                     ),
                   if (friendRequestDirection == "received") ...[
                     IconButton(
                       onPressed: _acceptFriendRequest,
-                      icon: Icon(Icons.check, color: Colors.teal),
+                      icon: Icon(Icons.check, color: Colors.orange),
                       tooltip: 'Accept Request',
                       iconSize: 36,
                     ),
@@ -214,7 +214,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                 if (isFriend)
                   IconButton(
                     onPressed: _removeFriend,
-                    icon: Icon(Icons.person_remove, color: Colors.teal),
+                    icon: Icon(Icons.person_remove, color: Colors.red),
                     tooltip: 'Remove Friend',
                     iconSize: 36,
                   ),
@@ -236,7 +236,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                         ),
                       );
                     },
-                    icon: Icon(Icons.message, color: Colors.teal),
+                    icon: Icon(Icons.message, color: Colors.orange),
                     tooltip: 'Send Message',
                     iconSize: 36,
                   ),
@@ -255,7 +255,7 @@ class _FriendOptionsSheetState extends State<FriendOptionsSheet> {
                     ),
                   );
                 },
-                icon: Icon(Icons.account_circle, color: Colors.teal),
+                icon: Icon(Icons.account_circle, color: Colors.orange),
                 tooltip: 'View Profile',
                 iconSize: 36,
               ),

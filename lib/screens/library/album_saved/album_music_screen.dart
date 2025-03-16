@@ -8,8 +8,9 @@ import 'package:http/http.dart' as http;
 
 class AlbumMusicScreen extends StatefulWidget {
   final int albumId;
+  final String name;
 
-  AlbumMusicScreen({required this.albumId});
+  AlbumMusicScreen({required this.albumId, required this.name});
 
   @override
   _AlbumMusicScreenState createState() => _AlbumMusicScreenState();
@@ -69,46 +70,54 @@ class _AlbumMusicScreenState extends State<AlbumMusicScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Album Music',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.teal,
+        title: Text(widget.name, style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.orangeAccent.shade100,
         elevation: 0,
       ),
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: _songs.length,
-                  itemBuilder: (context, index) {
-                    final song = _songs[index];
-                    final name = song['user_name'] ?? 'Unknown Name';
-                    final description = song['description'] ?? 'No Description';
-                    final url = '$baseUrl/get_music_file/${song['id']}';
-                    final avatar = _authService.generateAvatarUrl(
-                      song['user_id'],
-                    );
+              : Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/background.png',
+                    ), // Path to your background image
+                    fit: BoxFit.cover, // Cover the whole screen
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: _songs.length,
+                    itemBuilder: (context, index) {
+                      final song = _songs[index];
+                      final name = song['user_name'] ?? 'Unknown Name';
+                      final description =
+                          song['description'] ?? 'No Description';
+                      final url = '$baseUrl/get_music_file/${song['id']}';
+                      final avatar = _authService.generateAvatarUrl(
+                        song['user_id'],
+                      );
 
-                    return AlbumMusicPlayer(
-                      id: song['id'],
-                      albumId: widget.albumId,
-                      url: url,
-                      user_id: song['user_id'],
-                      avatar: avatar,
-                      name: name,
-                      description: description,
-                      currentPlayingId: _currentPlayingId,
-                      setPlayingId: (int songId) {
-                        setState(() {
-                          _currentPlayingId = songId;
-                        });
-                      },
-                      onMusicRemoved: _removeSongFromList,
-                    );
-                  },
+                      return AlbumMusicPlayer(
+                        id: song['id'],
+                        albumId: widget.albumId,
+                        url: url,
+                        user_id: song['user_id'],
+                        avatar: avatar,
+                        name: name,
+                        description: description,
+                        currentPlayingId: _currentPlayingId,
+                        setPlayingId: (int songId) {
+                          setState(() {
+                            _currentPlayingId = songId;
+                          });
+                        },
+                        onMusicRemoved: _removeSongFromList,
+                      );
+                    },
+                  ),
                 ),
               ),
     );

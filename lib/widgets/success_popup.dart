@@ -23,14 +23,27 @@ class SuccessPopup extends StatelessWidget {
         return WillPopScope(
           onWillPop: () async => false,
           child: AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            backgroundColor: Colors.green.shade50,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            backgroundColor: Colors.white,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                success ? Icon(Icons.check_circle, color: Colors.green, size: 60) : Icon(Icons.close_outlined, color: Colors.red, size: 60),
-                SizedBox(height: 10),
-                Text(message, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green.shade800)),
+                SizedBox(height: 20),
+                success
+                    ? Icon(Icons.check_circle, color: Colors.green, size: 30)
+                    : Icon(Icons.warning_amber, color: Colors.red, size: 30),
+                SizedBox(height: 20),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: success ? Colors.green.shade800 : Colors.red,
+                  ),
+                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
@@ -42,6 +55,8 @@ class SuccessPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // This method is not used since the popup is handled via the showDialog method
-    throw UnimplementedError('SuccessPopup is not intended to be used in the widget tree.');
+    throw UnimplementedError(
+      'SuccessPopup is not intended to be used in the widget tree.',
+    );
   }
 }

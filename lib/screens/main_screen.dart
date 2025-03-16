@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
-import 'library/library_screen.dart';
 import 'personal/profile/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -11,7 +10,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _children = [HomeScreen(), LibraryScreen(), ProfileScreen()];
+  final List<Widget> _children = [HomeScreen(), ProfileScreen()];
 
   void onTabTapped(int index) {
     setState(() {
@@ -26,10 +25,11 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
+        selectedItemColor: Colors.orange,
+        unselectedItemColor: Colors.black,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
-          BottomNavigationBarItem(icon: Icon(Icons.library_music), label: 'Thư viện'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cá nhân'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Trang chủ"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Cá nhân"),
         ],
       ),
     );

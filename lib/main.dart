@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My App',
-      theme: ThemeData(primarySwatch: Colors.teal),
+      theme: ThemeData(primarySwatch: Colors.orange),
       home: FutureBuilder<String?>(
         future: _checkAuthToken(),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
@@ -30,7 +30,9 @@ class MyApp extends StatelessWidget {
             }
           } else {
             return Scaffold(
-              body: Center(child: CircularProgressIndicator()), // Loading indicator
+              body: Center(
+                child: CircularProgressIndicator(),
+              ), // Loading indicator
             );
           }
         },

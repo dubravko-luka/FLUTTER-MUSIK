@@ -10,7 +10,11 @@ class MessagingScreen extends StatefulWidget {
   final int connectId;
   final String recipientName;
 
-  MessagingScreen({required this.recipientId, required this.connectId, required this.recipientName});
+  MessagingScreen({
+    required this.recipientId,
+    required this.connectId,
+    required this.recipientName,
+  });
 
   @override
   _MessagingScreenState createState() => _MessagingScreenState();
@@ -75,7 +79,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
       return;
     }
 
-    final response = await http.get(Uri.parse('${baseUrl}/messages/${widget.recipientId}'), headers: {'Authorization': token});
+    final response = await http.get(
+      Uri.parse('${baseUrl}/messages/${widget.recipientId}'),
+      headers: {'Authorization': token},
+    );
 
     if (_isMounted) {
       if (response.statusCode == 200) {
@@ -107,7 +114,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
     final response = await http.post(
       Uri.parse('${baseUrl}/send_message'),
       headers: {'Content-Type': 'application/json', 'Authorization': token},
-      body: json.encode({'recipient_id': widget.recipientId, 'content': content}),
+      body: json.encode({
+        'recipient_id': widget.recipientId,
+        'content': content,
+      }),
     );
 
     if (response.statusCode == 201) {
@@ -121,7 +131,15 @@ class _MessagingScreenState extends State<MessagingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.recipientName), backgroundColor: Colors.teal, centerTitle: true, elevation: 1),
+      appBar: AppBar(
+        title: Text(
+          widget.recipientName,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.orange,
+        centerTitle: true,
+        elevation: 1,
+      ),
       body:
           _isLoading
               ? Center(child: CircularProgressIndicator())
@@ -131,31 +149,61 @@ class _MessagingScreenState extends State<MessagingScreen> {
                     child: ListView.builder(
                       itemCount: _messages.length,
                       reverse: true,
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 8,
+                      ),
                       itemBuilder: (context, index) {
                         final message = _messages[index];
                         bool isMe = message['is_me'];
 
                         return Align(
-                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment:
+                              isMe
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 5.0),
-                            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15.0,
+                              vertical: 10.0,
+                            ),
                             decoration: BoxDecoration(
-                              color: isMe ? Colors.teal.shade300 : Colors.grey.shade200,
+                              color:
+                                  isMe
+                                      ? Colors.orange.shade300
+                                      : Colors.grey.shade200,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(15.0),
                                 topRight: Radius.circular(15.0),
-                                bottomLeft: isMe ? Radius.circular(15.0) : Radius.circular(0),
-                                bottomRight: isMe ? Radius.circular(0) : Radius.circular(15.0),
+                                bottomLeft:
+                                    isMe
+                                        ? Radius.circular(15.0)
+                                        : Radius.circular(0),
+                                bottomRight:
+                                    isMe
+                                        ? Radius.circular(0)
+                                        : Radius.circular(15.0),
                               ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(message['content'], style: TextStyle(color: isMe ? Colors.white : Colors.black87)),
+                                Text(
+                                  message['content'],
+                                  style: TextStyle(
+                                    color: isMe ? Colors.white : Colors.black87,
+                                  ),
+                                ),
                                 const SizedBox(height: 5),
-                                Text('at ${message['created_at']}', style: TextStyle(fontSize: 10, color: isMe ? Colors.white70 : Colors.black54)),
+                                Text(
+                                  'at ${message['created_at']}',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color:
+                                        isMe ? Colors.white70 : Colors.black54,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -174,15 +222,24 @@ class _MessagingScreenState extends State<MessagingScreen> {
                               filled: true,
                               fillColor: Colors.grey[100],
                               hintText: 'Type your message...',
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide.none),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 5,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         CircleAvatar(
-                          backgroundColor: Colors.teal,
-                          child: IconButton(icon: Icon(Icons.send, color: Colors.white), onPressed: _sendMessage),
+                          backgroundColor: Colors.orange,
+                          child: IconButton(
+                            icon: Icon(Icons.send, color: Colors.white),
+                            onPressed: _sendMessage,
+                          ),
                         ),
                       ],
                     ),
