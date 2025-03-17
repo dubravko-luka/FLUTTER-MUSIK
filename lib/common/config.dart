@@ -1,3 +1,3 @@
 // lib/config.dart
 
-const String baseUrl = 'http://127.0.0.1:8088';
+const String baseUrl = 'http://103.56.160.227:8089';

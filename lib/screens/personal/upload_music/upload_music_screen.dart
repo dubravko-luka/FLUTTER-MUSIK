@@ -23,10 +23,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
   Duration _position = Duration.zero;
 
   void _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['mp3'],
-    );
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['mp3']);
 
     if (result != null) {
       _file = result;
@@ -45,8 +42,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
       _audioPlayer.positionStream.listen((position) {
         setState(() {
           _position = position;
-          _progress =
-              position.inMilliseconds / _audioPlayer.duration!.inMilliseconds;
+          _progress = position.inMilliseconds / _audioPlayer.duration!.inMilliseconds;
         });
       });
 
@@ -60,10 +56,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
 
   Future<void> _uploadMusic() async {
     if (_file == null) {
-      SuccessPopup(
-        message: 'Vui lòng chọn file nhạc',
-        outerContext: context,
-      ).show(success: false);
+      SuccessPopup(message: 'Vui lòng chọn file nhạc', outerContext: context).show(success: false);
       return;
     }
 
@@ -82,9 +75,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
           ..headers['Authorization'] = token
           ..fields['description'] = _descriptionController.text;
 
-    request.files.add(
-      await http.MultipartFile.fromPath('file', _file!.files.single.path!),
-    );
+    request.files.add(await http.MultipartFile.fromPath('file', _file!.files.single.path!));
 
     final response = await request.send();
 
@@ -93,16 +84,10 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     });
 
     if (response.statusCode == 201) {
-      SuccessPopup(
-        message: 'Đã tải nhạc lên thành công',
-        outerContext: context,
-      ).show();
+      SuccessPopup(message: 'Đã tải nhạc lên thành công', outerContext: context).show();
       _resetForm();
     } else {
-      SuccessPopup(
-        message: 'Tải nhạc lên thất bại',
-        outerContext: context,
-      ).show(success: false);
+      SuccessPopup(message: 'Tải nhạc lên thất bại', outerContext: context).show(success: false);
     }
   }
 
@@ -145,20 +130,12 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: Colors.white,
           title: Text('Xác nhận', style: TextStyle(color: Colors.orange)),
-          content: Text(
-            'Bạn có chắc chắn muốn thoát không?',
-            style: TextStyle(color: Colors.black87),
-          ),
+          content: Text('Bạn có chắc chắn muốn thoát không?', style: TextStyle(color: Colors.black87)),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Từ chối', style: TextStyle(color: Colors.orange)),
-            ),
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text('Từ chối', style: TextStyle(color: Colors.orange))),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
@@ -177,10 +154,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Tải nhạc lên',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+          title: Text('Tải nhạc lên', style: TextStyle(fontWeight: FontWeight.bold)),
           backgroundColor: Colors.orangeAccent.shade100,
           foregroundColor: Colors.black,
           leading: IconButton(
@@ -197,9 +171,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                'assets/background.png',
-              ), // Path to your background image
+              image: AssetImage('assets/background.png'), // Path to your background image
               fit: BoxFit.cover, // Cover the whole screen
             ),
           ),
@@ -207,9 +179,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -221,13 +191,8 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                         decoration: InputDecoration(
                           labelText: 'Chọn tệp nhạc',
                           prefixIcon: Icon(Icons.upload_file),
-                          suffixIcon:
-                              _file != null
-                                  ? Icon(Icons.check, color: Colors.green)
-                                  : null,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          suffixIcon: _file != null ? Icon(Icons.check, color: Colors.green) : null,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         readOnly: true,
                         controller: TextEditingController(text: _selectedFile),
@@ -241,9 +206,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                         decoration: InputDecoration(
                           labelText: 'Mô tả tâm trạng của bạn',
                           prefixIcon: Icon(Icons.edit),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         maxLines: 3,
                       ),
@@ -253,18 +216,10 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
                           : ElevatedButton(
                             onPressed: _uploadMusic,
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 50,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 50),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               backgroundColor: Colors.orange,
-                              textStyle: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             child: Text('Upload'),
                           ),
@@ -283,9 +238,7 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
     return Row(
       children: [
         IconButton(
-          icon: Icon(
-            _audioPlayer.playerState.playing ? Icons.pause : Icons.play_arrow,
-          ),
+          icon: Icon(_audioPlayer.playerState.playing ? Icons.pause_circle_filled : Icons.play_circle_fill, color: Colors.orange),
           onPressed: () {
             if (_audioPlayer.playerState.playing) {
               _pauseMusic();
@@ -302,6 +255,8 @@ class _UploadMusicScreenState extends State<UploadMusicScreen> {
             onChanged: (value) {
               _seekMusic(value);
             },
+            activeColor: Colors.orange,
+            inactiveColor: Colors.orange.shade100,
           ),
         ),
         Text(_formatDuration(_duration)),
